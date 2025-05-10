@@ -12,12 +12,12 @@ import {
 } from "@/app/contexts/VideoContext";
 
 export function VideoProvider({ children }: Readonly<{ children: ReactNode }>) {
-  const [videos, setMovies] = useState<Video[]>([]);
+  const [videos, setVideos] = useState<Video[]>([]);
 
   const refreshVideos = useCallback(async () => {
     try {
       const res = await axios.get<Video[]>("/api/videos");
-      setMovies(res.data);
+      setVideos(res.data);
     } catch (err) {
       console.error("Failed to fetch videos:", err);
     }
