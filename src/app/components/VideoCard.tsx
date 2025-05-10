@@ -57,7 +57,7 @@ export default function VideoCard({
       subTitle={!video.is_available ? "Unavailable" : undefined}
       header={header}
       footer={footer}
-      className="md:w-20rem"
+      className="mx-auto w-full md:max-w-sm"
     >
       <p className="m-0">{video.video_description}</p>
     </Card>

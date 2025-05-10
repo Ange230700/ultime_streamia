@@ -18,7 +18,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="grid-nogutter grid gap-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {videos.map((video) => (
         <VideoCard
           key={video.video_id}
