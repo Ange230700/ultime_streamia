@@ -1,7 +1,18 @@
+// next.config.ts
+
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "setplex.com",
+        port: "",
+        pathname: "/blog/**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
