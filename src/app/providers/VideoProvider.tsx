@@ -1,4 +1,4 @@
-// src\app\providers\MovieProvider.tsx
+// src\app\providers\VideoProvider.tsx
 
 "use client";
 import axios from "axios";
@@ -9,12 +9,12 @@ import {
   VideoContext,
   Video,
   VideoContextType,
-} from "../contexts/VideoContext";
+} from "@/app/contexts/VideoContext";
 
-export function MovieProvider({ children }: Readonly<{ children: ReactNode }>) {
-  const [movies, setMovies] = useState<Video[]>([]);
+export function VideoProvider({ children }: Readonly<{ children: ReactNode }>) {
+  const [videos, setMovies] = useState<Video[]>([]);
 
-  const refreshMovies = useCallback(async () => {
+  const refreshVideos = useCallback(async () => {
     try {
       const res = await axios.get<Video[]>("/api/videos");
       setMovies(res.data);
@@ -24,12 +24,12 @@ export function MovieProvider({ children }: Readonly<{ children: ReactNode }>) {
   }, []);
 
   useEffect(() => {
-    refreshMovies();
-  }, [refreshMovies]);
+    refreshVideos();
+  }, [refreshVideos]);
 
   const value = useMemo<VideoContextType>(
-    () => ({ movies, refreshMovies }),
-    [movies, refreshMovies],
+    () => ({ videos, refreshVideos }),
+    [videos, refreshVideos],
   );
 
   return (
@@ -37,6 +37,6 @@ export function MovieProvider({ children }: Readonly<{ children: ReactNode }>) {
   );
 }
 
-MovieProvider.propTypes = {
+VideoProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };

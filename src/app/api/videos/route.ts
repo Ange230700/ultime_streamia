@@ -5,8 +5,24 @@ import { prisma } from "@/lib/prisma";
 
 // GET /api/videos
 export async function GET() {
-  const videos = await prisma.video.findMany();
-  return NextResponse.json(videos);
+  const videos = await prisma.video.findMany({
+    select: {
+      video_id: true,
+      video_title: true,
+      video_description: true,
+      is_available: true,
+      cover_image_data: true,
+    },
+  });
+
+  const payload = videos.map((v) => ({
+    ...v,
+    cover_image_data: v.cover_image_data
+      ? Buffer.from(v.cover_image_data).toString("base64")
+      : null,
+  }));
+
+  return NextResponse.json(payload);
 }
 
 // POST /api/videos

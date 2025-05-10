@@ -8,14 +8,15 @@ export interface Video {
   video_title: string;
   video_description?: string;
   is_available: boolean;
+  cover_image_data?: string;
 }
 
 export interface VideoContextType {
-  movies: Video[];
-  refreshMovies: () => Promise<void>;
+  videos: Video[];
+  refreshVideos: () => Promise<void>;
 }
 
 export const VideoContext = createContext<VideoContextType>({
-  movies: [],
-  refreshMovies: async () => {},
+  videos: [],
+  refreshVideos: async () => {},
 });

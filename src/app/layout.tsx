@@ -9,7 +9,7 @@ import "primereact/resources/themes/soho-dark/theme.css";
 import "primeicons/primeicons.css";
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
-import { MovieProvider } from "@/app/providers/VideoProvider";
+import { VideoProvider } from "@/app/providers/VideoProvider";
 import { CategoryProvider } from "@/app/providers/CategoryProvider";
 import { UserProvider } from "@/app/providers/UserProvider";
 
@@ -45,7 +45,7 @@ export default function RootLayout({
             </header>
             <main className="flex flex-1 flex-col">
               <CategoryProvider>
-                <MovieProvider>{children}</MovieProvider>
+                <VideoProvider>{children}</VideoProvider>
               </CategoryProvider>
             </main>
             <Footer />

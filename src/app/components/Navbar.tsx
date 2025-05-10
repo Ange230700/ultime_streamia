@@ -4,6 +4,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Menubar } from "primereact/menubar";
 import { InputText } from "primereact/inputtext";
 import { MenuItem } from "primereact/menuitem";
@@ -15,11 +16,13 @@ type NavbarMenuItem = MenuItem & {
 };
 
 export default function Navbar() {
+  const router = useRouter();
   const items: NavbarMenuItem[] = [
-    // {
-    //   label: "Home",
-    //   icon: "pi pi-home",
-    // },
+    {
+      label: "Home",
+      icon: "pi pi-home",
+      command: () => router.push("/home"),
+    },
   ];
 
   const start = (
