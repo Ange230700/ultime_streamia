@@ -2,11 +2,23 @@
 
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "primereact/button";
 import Image from "next/image";
 
 export default function Home() {
+  const [isMd, setIsMd] = useState(false);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 768px)");
+    const onChange = (e: MediaQueryListEvent) => setIsMd(e.matches);
+    mql.addEventListener("change", onChange);
+    setIsMd(mql.matches);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
+
+  const clip = isMd ? "polygon(8% 0, 100% 0%, 100% 100%, 0 100%)" : "none";
+
   return (
     <div className="flex-1">
       <div className="flex flex-col md:flex-row">
@@ -45,7 +57,7 @@ export default function Home() {
             src="https://setplex.com/blog/wp-content/uploads/2022/04/video-streaming-platform-1024x576.jpg"
             alt="hero-1"
             className="object-cover md:ml-auto md:h-full"
-            style={{ clipPath: "polygon(8% 0, 100% 0%, 100% 100%, 0 100%)" }}
+            style={{ clipPath: clip, transition: "clip-path 0.3s ease" }}
           />
         </div>
       </div>
