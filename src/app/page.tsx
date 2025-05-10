@@ -9,7 +9,7 @@ import Image from "next/image";
 export default function Home() {
   return (
     <div className="flex-1">
-      <div className="flex">
+      <div className="flex flex-col md:flex-row">
         <div className="align-items-center col-12 flex p-6 text-center md:col-6 md:text-left">
           <section>
             <span className="mb-1 block text-6xl font-bold">
@@ -37,7 +37,7 @@ export default function Home() {
             </div>
           </section>
         </div>
-        <div className="col-12 overflow-hidden md:col-6">
+        <div className="relative col-12 overflow-hidden md:col-6">
           <Image
             width={768}
             height={576}
