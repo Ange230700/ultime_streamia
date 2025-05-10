@@ -24,7 +24,7 @@ export default function Navbar() {
 
   const start = (
     <Link href="/" passHref>
-      <p className="text-5xl hover:underline">Streamia</p>
+      <p className="text-5xl font-bold hover:underline">Streamia</p>
     </Link>
   );
   const end = (
