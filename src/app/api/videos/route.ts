@@ -16,7 +16,10 @@ export async function GET() {
   });
 
   const payload = videos.map((v) => ({
-    ...v,
+    video_id: Number(v.video_id),
+    video_title: v.video_title,
+    video_description: v.video_description,
+    is_available: v.is_available,
     cover_image_data: v.cover_image_data
       ? Buffer.from(v.cover_image_data).toString("base64")
       : null,

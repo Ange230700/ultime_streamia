@@ -23,12 +23,14 @@ export default function VideoCard({
 }: Readonly<VideoCardProps>) {
   // Header: show cover image if available
   const header = video.cover_image_data ? (
-    <Image
-      fill
-      alt={video.video_title}
-      src={`data:image/jpeg;base64,${video.cover_image_data}`}
-      style={{ width: "100%", height: "200px", objectFit: "cover" }}
-    />
+    <div style={{ position: "relative", width: "100%", height: "200px" }}>
+      <Image
+        alt={video.video_title}
+        src={`data:image/jpeg;base64,${video.cover_image_data}`}
+        fill
+        style={{ objectFit: "cover" }}
+      />
+    </div>
   ) : null;
 
   // Footer: Play + Watchlist buttons

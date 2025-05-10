@@ -6,7 +6,11 @@ import { prisma } from "@/lib/prisma";
 // GET /api/categories
 export async function GET() {
   const categories = await prisma.category.findMany();
-  return NextResponse.json(categories);
+  const safeCategories = categories.map((cat) => ({
+    category_id: Number(cat.category_id),
+    category_name: cat.category_name,
+  }));
+  return NextResponse.json(safeCategories);
 }
 
 // POST /api/categories
