@@ -8,8 +8,8 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center">
-      <div className="grid-nogutter surface-0 text-800 grid">
+    <div className="flex-1">
+      <div className="flex">
         <div className="align-items-center col-12 flex p-6 text-center md:col-6 md:text-left">
           <section>
             <span className="mb-1 block text-6xl font-bold">
@@ -23,21 +23,29 @@ export default function Home() {
               eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </p>
 
-            <Button
-              label="Check it out"
-              type="button"
-              className="p-button-raised mr-3"
-            />
+            <div className="mt-6 flex gap-2">
+              <Button
+                label="Check it out"
+                type="button"
+                className="p-button-raised mr-3"
+              />
+              <Button
+                label="Learn more"
+                type="button"
+                className="p-button-outlined"
+              />
+            </div>
           </section>
         </div>
         <div className="col-12 overflow-hidden md:col-6">
           <Image
-            width={600}
-            height={600}
+            width={768}
+            height={576}
             priority={true}
             src="https://setplex.com/blog/wp-content/uploads/2022/04/video-streaming-platform-1024x576.jpg"
             alt="hero-1"
-            className="block h-auto w-full object-cover object-center md:ml-auto md:h-full md:w-auto"
+            className="object-cover md:ml-auto md:h-full"
+            style={{ clipPath: "polygon(8% 0, 100% 0%, 100% 100%, 0 100%)" }}
           />
         </div>
       </div>
