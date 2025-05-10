@@ -6,6 +6,8 @@ import { PrimeReactProvider } from "primereact/api";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "primereact/resources/themes/soho-dark/theme.css";
+import "primeicons/primeicons.css";
+import Navbar from "@/app/components/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,11 +30,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="flex min-h-screen flex-col">
+    <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} flex flex-1 flex-col antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
-        <PrimeReactProvider>{children}</PrimeReactProvider>
+        <PrimeReactProvider>
+          <header>
+            <Navbar />
+          </header>
+          <main className="flex flex-1 flex-col">{children}</main>
+        </PrimeReactProvider>
       </body>
     </html>
   );
