@@ -8,6 +8,7 @@ import "./globals.css";
 import "primereact/resources/themes/soho-dark/theme.css";
 import "primeicons/primeicons.css";
 import Navbar from "@/app/components/Navbar";
+import Footer from "@/app/components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,6 +40,7 @@ export default function RootLayout({
             <Navbar />
           </header>
           <main className="flex flex-1 flex-col">{children}</main>
+          <Footer />
         </PrimeReactProvider>
       </body>
     </html>
