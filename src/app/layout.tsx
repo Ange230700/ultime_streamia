@@ -4,11 +4,14 @@ import React from "react";
 import type { Metadata } from "next";
 import { PrimeReactProvider } from "primereact/api";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "@/app/globals.css";
 import "primereact/resources/themes/soho-dark/theme.css";
 import "primeicons/primeicons.css";
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
+import { MovieProvider } from "@/app/providers/VideoProvider";
+import { CategoryProvider } from "@/app/providers/CategoryProvider";
+import { UserProvider } from "@/app/providers/UserProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,11 +39,17 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
         <PrimeReactProvider>
-          <header>
-            <Navbar />
-          </header>
-          <main className="flex flex-1 flex-col">{children}</main>
-          <Footer />
+          <UserProvider>
+            <header>
+              <Navbar />
+            </header>
+            <main className="flex flex-1 flex-col">
+              <CategoryProvider>
+                <MovieProvider>{children}</MovieProvider>
+              </CategoryProvider>
+            </main>
+            <Footer />
+          </UserProvider>
         </PrimeReactProvider>
       </body>
     </html>
