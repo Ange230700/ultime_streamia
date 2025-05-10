@@ -4,10 +4,10 @@
 
 import React from "react";
 // import { useCategories } from "@/app/hooks/useCategories";
-// import { useMovies } from "@/app/hooks/useMovies";
+// import { useVideos } from "@/app/hooks/useVideos";
 
 export default function HomePage() {
-  // const { movies } = useMovies();
+  // const { videos } = useVideos();
   // const { categories, categoriesWithMovies } = useCategories();
 
   return <div>Home</div>;
