@@ -9,6 +9,10 @@ export interface Video {
   video_description?: string;
   is_available: boolean;
   cover_image_data?: string;
+  categories: {
+    category_id: number;
+    category_name: string;
+  }[];
 }
 
 export interface VideoContextType {

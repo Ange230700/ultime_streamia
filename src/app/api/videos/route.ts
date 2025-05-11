@@ -18,7 +18,19 @@ export async function GET(request: Request) {
       video_description: true,
       is_available: true,
       cover_image_data: true,
+
+      category_video: {
+        select: {
+          category: {
+            select: {
+              category_id: true,
+              category_name: true,
+            },
+          },
+        },
+      },
     },
+    orderBy: { release_date: "desc" },
   });
 
   const total = await prisma.video.count();
@@ -31,6 +43,10 @@ export async function GET(request: Request) {
     cover_image_data: v.cover_image_data
       ? Buffer.from(v.cover_image_data).toString("base64")
       : null,
+    categories: v.category_video.map((cv) => ({
+      category_id: Number(cv.category?.category_id),
+      category_name: cv.category?.category_name,
+    })),
   }));
 
   return NextResponse.json({ videos: payload, total });
