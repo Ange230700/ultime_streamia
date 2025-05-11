@@ -30,6 +30,7 @@ export default function VideoCard({
         src={`data:image/jpeg;base64,${video.cover_image_data}`}
         fill
         style={{ objectFit: "cover" }}
+        className="rounded-t-lg"
       />
     </div>
   ) : null;
