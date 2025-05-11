@@ -37,33 +37,41 @@ export default function VideoCard({
 
   const title = loading ? <Skeleton className="w-full" /> : video.video_title;
 
-  const subTitle = loading ? (
-    <Skeleton className="w-full" />
-  ) : !video.is_available ? (
-    "Unavailable"
-  ) : (
-    "Available"
-  );
+  let subTitleContent: React.ReactNode;
+  if (loading) {
+    subTitleContent = <Skeleton className="w-full" />;
+  } else if (!video.is_available) {
+    subTitleContent = "Unavailable";
+  } else {
+    subTitleContent = "Available";
+  }
+
+  let headerImageContent: React.ReactNode;
+  if (loading) {
+    headerImageContent = <Skeleton height="4rem" className="w-full" />;
+  } else if (!video.cover_image_data || imgError) {
+    headerImageContent = (
+      <div className="flex aspect-video items-center justify-center rounded-t-lg">
+        <Avatar icon="pi pi-image" size="xlarge" shape="circle" />
+      </div>
+    );
+  } else {
+    headerImageContent = (
+      <div className="relative aspect-video w-full">
+        <Image
+          alt={video.video_title}
+          src={`data:image/jpeg;base64,${video.cover_image_data}`}
+          fill
+          className="rounded-t-lg object-cover"
+          onError={handleError}
+        />
+      </div>
+    );
+  }
 
   const header = (
     <div className="relative aspect-video w-full overflow-hidden rounded-t-lg">
-      {loading ? (
-        <Skeleton height="4rem" className="w-full" />
-      ) : !video.cover_image_data || imgError ? (
-        <div className="flex aspect-video items-center justify-center rounded-t-lg">
-          <Avatar icon="pi pi-image" size="xlarge" shape="circle" />
-        </div>
-      ) : (
-        <div className="relative aspect-video w-full">
-          <Image
-            alt={video.video_title}
-            src={`data:image/jpeg;base64,${video.cover_image_data}`}
-            fill
-            className="rounded-t-lg object-cover"
-            onError={handleError}
-          />
-        </div>
-      )}
+      {headerImageContent}
       {loading ? (
         <Skeleton height="4rem" className="w-full" />
       ) : (
@@ -115,7 +123,7 @@ export default function VideoCard({
   return (
     <Card
       title={title}
-      subTitle={subTitle}
+      subTitle={subTitleContent}
       header={header}
       footer={footer}
       className={`${className} w-full md:max-w-sm`}
