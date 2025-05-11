@@ -13,10 +13,12 @@ export interface Video {
 
 export interface VideoContextType {
   videos: Video[];
+  loading: boolean;
   refreshVideos: () => Promise<void>;
 }
 
 export const VideoContext = createContext<VideoContextType>({
   videos: [],
+  loading: true,
   refreshVideos: async () => {},
 });

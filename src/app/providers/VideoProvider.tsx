@@ -13,13 +13,17 @@ import {
 
 export function VideoProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [videos, setVideos] = useState<Video[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const refreshVideos = useCallback(async () => {
+    setLoading(true);
     try {
       const res = await axios.get<Video[]>("/api/videos");
       setVideos(res.data);
     } catch (err) {
       console.error("Failed to fetch videos:", err);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -28,8 +32,8 @@ export function VideoProvider({ children }: Readonly<{ children: ReactNode }>) {
   }, [refreshVideos]);
 
   const value = useMemo<VideoContextType>(
-    () => ({ videos, refreshVideos }),
-    [videos, refreshVideos],
+    () => ({ videos, loading, refreshVideos }),
+    [videos, loading, refreshVideos],
   );
 
   return (
