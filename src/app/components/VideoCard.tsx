@@ -16,6 +16,7 @@ export interface VideoCardProps {
   readonly onPlay?: (video: Video) => void;
   readonly onAddToWatchlist?: (video: Video) => void;
   readonly onAddToFavorites?: (video: Video) => void;
+  className?: string;
 }
 
 export default function VideoCard({
@@ -23,6 +24,7 @@ export default function VideoCard({
   onPlay,
   onAddToWatchlist,
   onAddToFavorites,
+  className = "",
 }: Readonly<VideoCardProps>) {
   const [imgError, setImgError] = useState(false);
 
@@ -32,24 +34,23 @@ export default function VideoCard({
 
   const header =
     !video.cover_image_data || imgError ? (
-      <div className="flex h-[200px] w-full items-center justify-center rounded-t-lg">
+      <div className="flex aspect-video items-center justify-center rounded-t-lg">
         <Avatar icon="pi pi-image" size="xlarge" shape="circle" />
       </div>
     ) : (
-      <div className="relative h-[200px] w-full">
+      <div className="relative aspect-video w-full">
         <Image
           alt={video.video_title}
           src={`data:image/jpeg;base64,${video.cover_image_data}`}
           fill
-          style={{ objectFit: "cover" }}
-          className="rounded-t-lg"
+          className="rounded-t-lg object-cover"
           onError={handleError}
         />
       </div>
     );
 
   const footer = (
-    <div className="flex justify-end gap-3">
+    <div className="flex justify-end gap-2 p-2">
       <Button
         icon="pi pi-play"
         className="p-button-rounded p-button-outlined"
@@ -58,13 +59,13 @@ export default function VideoCard({
       />
       <Button
         icon="pi pi-heart"
-        className="p-button-rounded p-button-outlined ml-2"
+        className="p-button-rounded p-button-outlined"
         aria-label="Add to Favorites"
         onClick={() => onAddToFavorites?.(video)}
       />
       <Button
         icon="pi pi-plus"
-        className="p-button-rounded p-button-outlined ml-2"
+        className="p-button-rounded p-button-outlined"
         aria-label="Add to Watchlist"
         onClick={() => onAddToWatchlist?.(video)}
       />
@@ -74,12 +75,14 @@ export default function VideoCard({
   return (
     <Card
       title={video.video_title}
-      subTitle={!video.is_available ? "Unavailable" : undefined}
+      subTitle={!video.is_available ? "Unavailable" : "Available"}
       header={header}
       footer={footer}
-      className="mx-auto w-full md:max-w-sm"
+      className={`${className} w-full md:max-w-sm`}
     >
-      <p className="m-0">{video.video_description}</p>
+      <p className="line-clamp-3 text-sm sm:text-base">
+        {video.video_description}
+      </p>
     </Card>
   );
 }
