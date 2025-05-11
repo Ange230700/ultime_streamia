@@ -32,22 +32,33 @@ export default function VideoCard({
     setImgError(true);
   };
 
-  const header =
-    !video.cover_image_data || imgError ? (
-      <div className="flex aspect-video items-center justify-center rounded-t-lg">
-        <Avatar icon="pi pi-image" size="xlarge" shape="circle" />
-      </div>
-    ) : (
-      <div className="relative aspect-video w-full">
-        <Image
-          alt={video.video_title}
-          src={`data:image/jpeg;base64,${video.cover_image_data}`}
-          fill
-          className="rounded-t-lg object-cover"
-          onError={handleError}
-        />
-      </div>
-    );
+  const header = (
+    <div className="relative aspect-video w-full overflow-hidden rounded-t-lg">
+      {!video.cover_image_data || imgError ? (
+        <div className="flex aspect-video items-center justify-center rounded-t-lg">
+          <Avatar icon="pi pi-image" size="xlarge" shape="circle" />
+        </div>
+      ) : (
+        <div className="relative aspect-video w-full">
+          <Image
+            alt={video.video_title}
+            src={`data:image/jpeg;base64,${video.cover_image_data}`}
+            fill
+            className="rounded-t-lg object-cover"
+            onError={handleError}
+          />
+        </div>
+      )}
+      {!video.is_available && (
+        <div
+          className="absolute inset-0 flex items-center justify-center opacity-90 backdrop-blur-3xl"
+          style={{ backgroundColor: "var(--highlight-bg)" }}
+        >
+          <i className="pi pi-lock" style={{ fontSize: "3rem" }} />
+        </div>
+      )}
+    </div>
+  );
 
   const footer = (
     <div className="flex justify-end gap-2 p-2">
