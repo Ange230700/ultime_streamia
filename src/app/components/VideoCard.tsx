@@ -14,14 +14,15 @@ export interface VideoCardProps {
   };
   readonly onPlay?: (video: Video) => void;
   readonly onAddToWatchlist?: (video: Video) => void;
+  readonly onAddToFavorites?: (video: Video) => void;
 }
 
 export default function VideoCard({
   video,
   onPlay,
   onAddToWatchlist,
+  onAddToFavorites,
 }: Readonly<VideoCardProps>) {
-  // Header: show cover image if available
   const header = video.cover_image_data ? (
     <div style={{ position: "relative", width: "100%", height: "200px" }}>
       <Image
@@ -33,9 +34,8 @@ export default function VideoCard({
     </div>
   ) : null;
 
-  // Footer: Play + Watchlist buttons
   const footer = (
-    <div className="justify-content-end flex">
+    <div className="flex justify-end gap-3">
       <Button
         icon="pi pi-play"
         className="p-button-rounded p-button-outlined"
@@ -44,6 +44,12 @@ export default function VideoCard({
       />
       <Button
         icon="pi pi-heart"
+        className="p-button-rounded p-button-outlined ml-2"
+        aria-label="Add to Favorites"
+        onClick={() => onAddToFavorites?.(video)}
+      />
+      <Button
+        icon="pi pi-plus"
         className="p-button-rounded p-button-outlined ml-2"
         aria-label="Add to Watchlist"
         onClick={() => onAddToWatchlist?.(video)}

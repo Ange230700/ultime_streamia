@@ -16,6 +16,9 @@ export default function HomePage() {
   const addToWatchlist = (video: Video) => {
     console.log("Add to watchlist", video.video_title);
   };
+  const addToFavorites = (video: Video) => {
+    console.log("Add to favorites", video.video_title);
+  };
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -25,6 +28,7 @@ export default function HomePage() {
           video={video}
           onPlay={playVideo}
           onAddToWatchlist={addToWatchlist}
+          onAddToFavorites={addToFavorites}
         />
       ))}
     </div>
