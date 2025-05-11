@@ -16,8 +16,8 @@ export default function SkeletonVideoCard({
   const subTitle = <Skeleton className="mb-2 w-full" />;
 
   const header = (
-    <div className="relative aspect-video w-full">
-      <Skeleton className="h-full w-full rounded-t-lg" />
+    <div className="relative aspect-video w-full rounded-t-lg">
+      <Skeleton className="h-full w-full" />
     </div>
   );
 
@@ -37,9 +37,9 @@ export default function SkeletonVideoCard({
       footer={footer}
       className={`${className} w-full md:max-w-sm`}
     >
-      <p className="line-clamp-3 text-sm sm:text-base">
+      <div className="line-clamp-3 text-sm sm:text-base">
         <Skeleton className="mb-2 w-full" />
-      </p>
+      </div>
     </Card>
   );
 }
