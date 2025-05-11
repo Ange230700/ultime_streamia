@@ -32,14 +32,11 @@ export default function VideoCard({
 
   const header =
     !video.cover_image_data || imgError ? (
-      <div
-        className="flex items-center justify-center rounded-t-lg"
-        style={{ height: "200px" }}
-      >
+      <div className="flex h-[200px] w-full items-center justify-center rounded-t-lg">
         <Avatar icon="pi pi-image" size="xlarge" shape="circle" />
       </div>
     ) : (
-      <div style={{ position: "relative", width: "100%", height: "200px" }}>
+      <div className="relative h-[200px] w-full">
         <Image
           alt={video.video_title}
           src={`data:image/jpeg;base64,${video.cover_image_data}`}
