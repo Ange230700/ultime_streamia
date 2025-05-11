@@ -12,11 +12,11 @@ export interface Video {
 }
 
 export interface VideoContextType {
-  videos: Video[];
-  refreshVideos: () => Promise<void>;
+  totalCount: number;
+  fetchVideos: (offset: number, limit: number) => Promise<Video[]>;
 }
 
 export const VideoContext = createContext<VideoContextType>({
-  videos: [],
-  refreshVideos: async () => {},
+  totalCount: 0,
+  fetchVideos: async () => [],
 });
