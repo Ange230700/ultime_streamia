@@ -6,13 +6,12 @@ import { prisma } from "@/lib/prisma";
 // GET /api/videos
 export async function GET() {
   const videos = await prisma.video.findMany({
-    select: {
-      video_id: true,
-      video_title: true,
-      video_description: true,
-      is_available: true,
-      cover_image_data: true,
+    include: {
+      category_video: {
+        include: { category: true },
+      },
     },
+    orderBy: { release_date: "desc" },
   });
 
   const payload = videos.map((v) => ({
@@ -23,6 +22,10 @@ export async function GET() {
     cover_image_data: v.cover_image_data
       ? Buffer.from(v.cover_image_data).toString("base64")
       : null,
+    categories: v.category_video.map((cv) => ({
+      category_id: Number(cv.category?.category_id),
+      category_name: cv.category?.category_name,
+    })),
   }));
 
   return NextResponse.json(payload);
