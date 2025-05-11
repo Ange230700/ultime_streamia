@@ -25,7 +25,9 @@ export default function HomePage() {
     <div className="grid grid-cols-1 justify-items-center gap-4 px-2 py-8 sm:grid-cols-2 lg:grid-cols-3">
       {videos.map((video) => {
         if (loading) {
-          return <SkeletonVideoCard key={video.video_id} />;
+          return (
+            <SkeletonVideoCard className="mx-2 sm:mx-0" key={video.video_id} />
+          );
         }
         return (
           <VideoCard
