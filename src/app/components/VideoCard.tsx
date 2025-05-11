@@ -3,9 +3,10 @@
 "use client";
 
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
+import { Avatar } from "primereact/avatar";
 import type { Video } from "@/app/contexts/VideoContext";
 
 export interface VideoCardProps {
@@ -23,17 +24,32 @@ export default function VideoCard({
   onAddToWatchlist,
   onAddToFavorites,
 }: Readonly<VideoCardProps>) {
-  const header = video.cover_image_data ? (
-    <div style={{ position: "relative", width: "100%", height: "200px" }}>
-      <Image
-        alt={video.video_title}
-        src={`data:image/jpeg;base64,${video.cover_image_data}`}
-        fill
-        style={{ objectFit: "cover" }}
-        className="rounded-t-lg"
-      />
-    </div>
-  ) : null;
+  const [imgError, setImgError] = useState(false);
+
+  const handleError = () => {
+    setImgError(true);
+  };
+
+  const header =
+    !video.cover_image_data || imgError ? (
+      <div
+        className="flex items-center justify-center rounded-t-lg"
+        style={{ height: "200px" }}
+      >
+        <Avatar icon="pi pi-image" size="xlarge" shape="circle" />
+      </div>
+    ) : (
+      <div style={{ position: "relative", width: "100%", height: "200px" }}>
+        <Image
+          alt={video.video_title}
+          src={`data:image/jpeg;base64,${video.cover_image_data}`}
+          fill
+          style={{ objectFit: "cover" }}
+          className="rounded-t-lg"
+          onError={handleError}
+        />
+      </div>
+    );
 
   const footer = (
     <div className="flex justify-end gap-3">
