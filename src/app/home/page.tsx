@@ -2,56 +2,98 @@
 
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  VirtualScroller,
+  VirtualScrollerLazyEvent,
+  VirtualScrollerTemplateOptions,
+} from "primereact/virtualscroller";
+import { Skeleton } from "primereact/skeleton";
 import { useVideos } from "@/app/hooks/useVideos";
-import { useCategories } from "@/app/hooks/useCategories";
 import VideoCard from "@/app/components/VideoCard";
-import type { Category } from "@/app/contexts/CategoryContext";
+import type { Video } from "@/app/contexts/VideoContext";
 
-export default function HomePage() {
-  const { videos, loading } = useVideos();
-  const { categories } = useCategories();
+const itemSize = 300;
 
-  if (loading) {
+function renderItem(
+  video: Video | undefined,
+  options: VirtualScrollerTemplateOptions,
+) {
+  const style = { height: options.props.itemSize + "px" };
+  if (!video) {
     return (
-      <div className="grid flex-1 grid-cols-1 justify-items-center gap-4 px-2 py-8">
-        <i
-          className="pi pi-spin pi-spinner animate-spin place-self-center"
-          style={{ fontSize: "5rem" }}
-        />
+      <div
+        className={`align-items-center flex p-2 ${
+          options.odd ? "surface-hover" : ""
+        }`}
+        style={style}
+      >
+        <Skeleton width={options.even ? "60%" : "50%"} height="1.3rem" />
       </div>
     );
   }
 
   return (
-    <div className="flex-1 space-y-12 px-4 py-8">
-      {categories.map((cat: Category) => {
-        const vids = videos.filter((v) =>
-          v.categories.some((c) => c.category_id === cat.category_id),
-        );
-        if (vids.length === 0) return null;
+    <div className="p-2" style={style}>
+      <VideoCard
+        video={video}
+        onPlay={() => console.log("Play", video.video_title)}
+        onAddToWatchlist={() => console.log("Watchlist", video.video_title)}
+        onAddToFavorites={() => console.log("Favorites", video.video_title)}
+        className="w-full"
+      />
+    </div>
+  );
+}
 
-        return (
-          <section key={cat.category_id}>
-            <h2 className="mb-4 text-3xl font-semibold">{cat.category_name}</h2>
-            <div className="grid grid-cols-1 justify-items-center gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {vids.map((video) => (
-                <VideoCard
-                  key={video.video_id}
-                  video={video}
-                  onPlay={() => console.log("Play", video.video_title)}
-                  onAddToWatchlist={() =>
-                    console.log("Watchlist", video.video_title)
-                  }
-                  onAddToFavorites={() =>
-                    console.log("Favorites", video.video_title)
-                  }
-                />
-              ))}
-            </div>
-          </section>
-        );
-      })}
+export default function HomePage() {
+  const { totalCount, fetchVideos } = useVideos();
+  const [items, setItems] = useState<(Video | undefined)[]>([]);
+  const [loading, setLoading] = useState(true);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    setItems(Array.from({ length: totalCount }));
+    setLoading(false);
+  }, [totalCount]);
+
+  const loadAndSet = async (offset: number, limit: number) => {
+    const videos = await fetchVideos(offset, limit);
+    setItems((prev) => {
+      const updated = [...prev];
+      for (let i = 0; i < videos.length; i++) {
+        updated[offset + i] = videos[i];
+      }
+      return updated;
+    });
+    setLoading(false);
+  };
+
+  const onLazyLoad = (e: VirtualScrollerLazyEvent) => {
+    setLoading(true);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    const { first, last } = e;
+    timeoutRef.current = setTimeout(
+      () => loadAndSet(Number(first), Number(last) - Number(first)),
+      200,
+    );
+  };
+
+  return (
+    <div className="card justify-content-center flex">
+      <VirtualScroller
+        items={items}
+        itemSize={itemSize}
+        lazy
+        onLazyLoad={onLazyLoad}
+        itemTemplate={renderItem}
+        showLoader
+        loading={loading}
+        className="surface-border border-round border-1"
+        style={{ width: "100%", height: "80vh" }}
+      />
     </div>
   );
 }

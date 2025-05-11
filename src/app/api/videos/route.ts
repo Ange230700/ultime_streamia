@@ -4,15 +4,36 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/videos
-export async function GET() {
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const offset = parseInt(searchParams.get("offset") ?? "0");
+  const limit = parseInt(searchParams.get("limit") ?? "10");
+
   const videos = await prisma.video.findMany({
-    include: {
+    skip: offset,
+    take: limit,
+    select: {
+      video_id: true,
+      video_title: true,
+      video_description: true,
+      is_available: true,
+      cover_image_data: true,
+
       category_video: {
-        include: { category: true },
+        select: {
+          category: {
+            select: {
+              category_id: true,
+              category_name: true,
+            },
+          },
+        },
       },
     },
     orderBy: { release_date: "desc" },
   });
+
+  const total = await prisma.video.count();
 
   const payload = videos.map((v) => ({
     video_id: Number(v.video_id),
@@ -28,7 +49,7 @@ export async function GET() {
     })),
   }));
 
-  return NextResponse.json(payload);
+  return NextResponse.json({ videos: payload, total });
 }
 
 // POST /api/videos

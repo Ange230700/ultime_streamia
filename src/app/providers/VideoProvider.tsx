@@ -11,29 +11,34 @@ import {
   VideoContextType,
 } from "@/app/contexts/VideoContext";
 
-export function VideoProvider({ children }: Readonly<{ children: ReactNode }>) {
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+interface VideosResponse {
+  videos: Video[];
+  total: number;
+}
 
-  const refreshVideos = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get<Video[]>("/api/videos");
-      setVideos(res.data);
-    } catch (err) {
-      console.error("Failed to fetch videos:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+export function VideoProvider({ children }: Readonly<{ children: ReactNode }>) {
+  const [totalCount, setTotalCount] = useState<number>(0);
+
+  const fetchVideos = useCallback(
+    async (offset: number, limit: number): Promise<Video[]> => {
+      const res = await axios.get<VideosResponse>("/api/videos", {
+        params: { offset, limit },
+      });
+
+      const { videos, total } = res.data;
+      setTotalCount(total);
+      return videos;
+    },
+    [],
+  );
 
   useEffect(() => {
-    refreshVideos();
-  }, [refreshVideos]);
+    fetchVideos(0, 1).catch(() => {});
+  }, [fetchVideos]);
 
   const value = useMemo<VideoContextType>(
-    () => ({ videos, loading, refreshVideos }),
-    [videos, loading, refreshVideos],
+    () => ({ totalCount, fetchVideos }),
+    [totalCount, fetchVideos],
   );
 
   return (
