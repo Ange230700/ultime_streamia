@@ -16,13 +16,27 @@ interface VideosResponse {
   total: number;
 }
 
+interface VideoQueryParams {
+  offset: number;
+  limit: number;
+  categoryId?: number;
+}
+
 export function VideoProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [totalCount, setTotalCount] = useState<number>(0);
 
   const fetchVideos = useCallback(
-    async (offset: number, limit: number): Promise<Video[]> => {
+    async (
+      offset: number,
+      limit: number,
+      params?: { categoryId?: number },
+    ): Promise<Video[]> => {
+      const query: VideoQueryParams = { offset, limit };
+      if (params?.categoryId != null) {
+        query.categoryId = params.categoryId;
+      }
       const res = await axios.get<VideosResponse>("/api/videos", {
-        params: { offset, limit },
+        params: query,
       });
 
       const { videos, total } = res.data;

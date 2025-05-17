@@ -2,98 +2,65 @@
 
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import {
-  VirtualScroller,
-  VirtualScrollerLazyEvent,
-  VirtualScrollerTemplateOptions,
-} from "primereact/virtualscroller";
-import { Skeleton } from "primereact/skeleton";
-import { useVideos } from "@/app/hooks/useVideos";
+import axios from "axios";
+import React, { useState, useEffect, useContext } from "react";
+import { DataScroller } from "primereact/datascroller";
+import { Video } from "@/app/contexts/VideoContext";
+import { CategoryContext } from "@/app/contexts/CategoryContext";
 import VideoCard from "@/app/components/VideoCard";
-import type { Video } from "@/app/contexts/VideoContext";
 
-const itemSize = 300;
+export default function CategoryVideoScroller() {
+  const { categories } = useContext(CategoryContext);
+  const [videosByCategory, setVideosByCategory] = useState<
+    Record<number, Video[]>
+  >({});
 
-function renderItem(
-  video: Video | undefined,
-  options: VirtualScrollerTemplateOptions,
-) {
-  const style = { height: options.props.itemSize + "px" };
-  if (!video) {
-    return (
-      <div
-        className={`align-items-center flex p-2 ${
-          options.odd ? "surface-hover" : ""
-        }`}
-        style={style}
-      >
-        <Skeleton width={options.even ? "60%" : "50%"} height="1.3rem" />
-      </div>
-    );
-  }
+  useEffect(() => {
+    categories.forEach(async (cat) => {
+      try {
+        const res = await axios.get<{ videos: Video[]; total: number }>(
+          `/api/categories/${cat.category_id}/videos`,
+          { params: { offset: 0, limit: 10 } },
+        );
+        setVideosByCategory((prev) => ({
+          ...prev,
+          [cat.category_id]: res.data.videos,
+        }));
+      } catch (err) {
+        console.error(`Failed to load videos for ${cat.category_name}`, err);
+      }
+    });
+  }, [categories]);
 
-  return (
-    <div className="p-2" style={style}>
+  const videoTemplate = (video: Video) => (
+    <div className="p-2">
       <VideoCard
         video={video}
         onPlay={() => console.log("Play", video.video_title)}
         onAddToWatchlist={() => console.log("Watchlist", video.video_title)}
         onAddToFavorites={() => console.log("Favorites", video.video_title)}
-        className="w-full"
       />
     </div>
   );
-}
-
-export default function HomePage() {
-  const { totalCount, fetchVideos } = useVideos();
-  const [items, setItems] = useState<(Video | undefined)[]>([]);
-  const [loading, setLoading] = useState(true);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    setItems(Array.from({ length: totalCount }));
-    setLoading(false);
-  }, [totalCount]);
-
-  const loadAndSet = async (offset: number, limit: number) => {
-    const videos = await fetchVideos(offset, limit);
-    setItems((prev) => {
-      const updated = [...prev];
-      for (let i = 0; i < videos.length; i++) {
-        updated[offset + i] = videos[i];
-      }
-      return updated;
-    });
-    setLoading(false);
-  };
-
-  const onLazyLoad = (e: VirtualScrollerLazyEvent) => {
-    setLoading(true);
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    const { first, last } = e;
-    timeoutRef.current = setTimeout(
-      () => loadAndSet(Number(first), Number(last) - Number(first)),
-      200,
-    );
-  };
 
   return (
-    <div className="card justify-content-center flex">
-      <VirtualScroller
-        items={items}
-        itemSize={itemSize}
-        lazy
-        onLazyLoad={onLazyLoad}
-        itemTemplate={renderItem}
-        showLoader
-        loading={loading}
-        className="surface-border border-round border-1"
-        style={{ width: "100%", height: "80vh" }}
-      />
+    <div className="space-y-8">
+      {categories.map((cat) => {
+        const vids = videosByCategory[cat.category_id] || [];
+        return (
+          <section key={cat.category_id}>
+            <h2 className="mb-2 text-2xl font-semibold">{cat.category_name}</h2>
+            <DataScroller
+              value={vids}
+              itemTemplate={videoTemplate}
+              rows={5}
+              inline
+              scrollHeight="300px"
+              header={`More ${cat.category_name}`}
+            />
+          </section>
+        );
+      })}
     </div>
   );
 }

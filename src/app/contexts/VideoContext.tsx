@@ -17,7 +17,11 @@ export interface Video {
 
 export interface VideoContextType {
   totalCount: number;
-  fetchVideos: (offset: number, limit: number) => Promise<Video[]>;
+  fetchVideos: (
+    offset: number,
+    limit: number,
+    params?: { categoryId?: number },
+  ) => Promise<Video[]>;
 }
 
 export const VideoContext = createContext<VideoContextType>({
