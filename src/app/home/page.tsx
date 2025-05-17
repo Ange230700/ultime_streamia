@@ -73,7 +73,9 @@ export default function Home() {
                 className="custom-carousel"
               />
             ) : (
-              <p className="text-500 text-sm">No videos in this category.</p>
+              <p className="text-500 text-center text-2xl">
+                No videos in this category.
+              </p>
             )}
           </section>
         );
