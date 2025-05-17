@@ -63,9 +63,9 @@ async function main() {
         data: {
           video_title: faker.lorem.words(3),
           video_description: faker.lorem.paragraph(),
-          card_image_data: Buffer.from(faker.string.alphanumeric(20)),
-          cover_image_data: Buffer.from(faker.string.alphanumeric(20)),
-          video_data: Buffer.from(faker.string.alphanumeric(20)),
+          card_image_data: null,
+          cover_image_data: null,
+          video_data: null,
           video_duration: faker.date.recent(),
           release_date: faker.date.past(),
           is_available: faker.datatype.boolean(),
