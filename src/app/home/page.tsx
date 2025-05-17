@@ -2,19 +2,22 @@
 
 "use client";
 
-import axios from "axios";
 import React, { useState, useEffect, useContext } from "react";
-import { DataScroller } from "primereact/datascroller";
-import { Video } from "@/app/contexts/VideoContext";
+import axios from "axios";
+import { Carousel, CarouselResponsiveOption } from "primereact/carousel";
 import { CategoryContext } from "@/app/contexts/CategoryContext";
+import { Video } from "@/app/contexts/VideoContext";
 import VideoCard from "@/app/components/VideoCard";
 
-export default function CategoryVideoScroller() {
+export default function Home() {
   const { categories } = useContext(CategoryContext);
+
+  // Per-category videos for Carousels
   const [videosByCategory, setVideosByCategory] = useState<
     Record<number, Video[]>
   >({});
 
+  // Fetch per-category videos
   useEffect(() => {
     categories.forEach(async (cat) => {
       try {
@@ -32,32 +35,46 @@ export default function CategoryVideoScroller() {
     });
   }, [categories]);
 
-  const videoTemplate = (video: Video) => (
+  const responsiveOptions: CarouselResponsiveOption[] = [
+    { breakpoint: "1400px", numVisible: 3, numScroll: 1 },
+    { breakpoint: "1199px", numVisible: 2, numScroll: 1 },
+    { breakpoint: "767px", numVisible: 1, numScroll: 1 },
+  ];
+
+  const videoItemTemplate = (video: Video) => (
     <div className="p-2">
       <VideoCard
         video={video}
         onPlay={() => console.log("Play", video.video_title)}
         onAddToWatchlist={() => console.log("Watchlist", video.video_title)}
         onAddToFavorites={() => console.log("Favorites", video.video_title)}
+        className="w-full"
       />
     </div>
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12 p-4">
+      {/* Category Carousels */}
       {categories.map((cat) => {
         const vids = videosByCategory[cat.category_id] || [];
         return (
-          <section key={cat.category_id}>
-            <h2 className="mb-2 text-2xl font-semibold">{cat.category_name}</h2>
-            <DataScroller
-              value={vids}
-              itemTemplate={videoTemplate}
-              rows={5}
-              inline
-              scrollHeight="300px"
-              header={`More ${cat.category_name}`}
-            />
+          <section key={cat.category_id} className="space-y-2">
+            <h2 className="text-2xl font-semibold">{cat.category_name}</h2>
+            {vids.length > 0 ? (
+              <Carousel
+                value={vids}
+                circular
+                autoplayInterval={3000}
+                numVisible={3}
+                numScroll={1}
+                responsiveOptions={responsiveOptions}
+                itemTemplate={videoItemTemplate}
+                className="custom-carousel"
+              />
+            ) : (
+              <p className="text-500 text-sm">No videos in this category.</p>
+            )}
           </section>
         );
       })}
