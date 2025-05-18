@@ -4,11 +4,9 @@
 
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { Carousel, CarouselResponsiveOption } from "primereact/carousel";
-import { ProgressSpinner } from "primereact/progressspinner";
 import { CategoryContext } from "@/app/contexts/CategoryContext";
 import { Video } from "@/app/contexts/VideoContext";
-import VideoCard from "@/app/components/VideoCard";
+import CategorySection from "@/app/components/CategorySection";
 
 export default function Home() {
   const { categories } = useContext(CategoryContext);
@@ -48,69 +46,16 @@ export default function Home() {
     });
   }, [categories]);
 
-  const responsiveOptions: CarouselResponsiveOption[] = [
-    { breakpoint: "1400px", numVisible: 3, numScroll: 1 },
-    { breakpoint: "1199px", numVisible: 2, numScroll: 1 },
-    { breakpoint: "767px", numVisible: 1, numScroll: 1 },
-  ];
-
   return (
     <div className="space-y-12 p-4">
-      {categories.map((cat) => {
-        const catId = cat.category_id;
-        const vids = videosByCategory[catId] || [];
-        const isLoading = loadingByCategory[catId] || false;
-
-        // Extracted content logic
-        let categoryContent: React.ReactNode;
-        if (isLoading) {
-          categoryContent = (
-            <div className="flex justify-center p-4">
-              <ProgressSpinner />
-            </div>
-          );
-        } else if (vids.length > 0) {
-          categoryContent = (
-            <Carousel
-              value={vids}
-              circular
-              autoplayInterval={3000}
-              numVisible={3}
-              numScroll={1}
-              responsiveOptions={responsiveOptions}
-              itemTemplate={(video: Video) => (
-                <div className="p-2">
-                  <VideoCard
-                    video={video}
-                    loading={isLoading}
-                    onPlay={() => console.log("Play", video.video_title)}
-                    onAddToWatchlist={() =>
-                      console.log("Watchlist", video.video_title)
-                    }
-                    onAddToFavorites={() =>
-                      console.log("Favorites", video.video_title)
-                    }
-                  />
-                </div>
-              )}
-              className="custom-carousel"
-            />
-          );
-        } else {
-          categoryContent = (
-            <p className="text-500 text-center text-2xl">
-              No videos in this category.
-            </p>
-          );
-        }
-
-        return (
-          <section key={catId} className="space-y-2">
-            <h2 className="text-2xl font-semibold">{cat.category_name}</h2>
-            {categoryContent}
-          </section>
-        );
-      })}
+      {categories.map((cat) => (
+        <CategorySection
+          key={cat.category_id}
+          title={cat.category_name}
+          videos={videosByCategory[cat.category_id] || []}
+          loading={loadingByCategory[cat.category_id] || false}
+        />
+      ))}
     </div>
   );
 }

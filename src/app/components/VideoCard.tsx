@@ -30,26 +30,16 @@ export default function VideoCard({
   loading = false,
 }: Readonly<VideoCardProps>) {
   const [imgError, setImgError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const handleError = () => setImgError(true);
+  const handleImageLoad = () => setIsLoaded(true);
 
   // Title or spinner
-  const title = loading ? (
-    <div className="flex justify-center py-2">
-      <ProgressSpinner />
-    </div>
-  ) : (
-    video.video_title
-  );
+  const title = video.video_title;
 
   // Subtitle or spinner
   let subTitleContent: React.ReactNode;
-  if (loading) {
-    subTitleContent = (
-      <div className="flex justify-center py-1">
-        <ProgressSpinner />
-      </div>
-    );
-  } else if (!video.is_available) {
+  if (!video.is_available) {
     subTitleContent = "Unavailable";
   } else {
     subTitleContent = "Available";
@@ -57,13 +47,7 @@ export default function VideoCard({
 
   // Header image or spinner/avatar
   let headerImageContent: React.ReactNode;
-  if (loading) {
-    headerImageContent = (
-      <div className="flex aspect-video items-center justify-center rounded-t-lg">
-        <ProgressSpinner />
-      </div>
-    );
-  } else if (!video.cover_image_data || imgError) {
+  if (!video.cover_image_data || imgError) {
     headerImageContent = (
       <div className="flex aspect-video items-center justify-center rounded-t-lg">
         <Avatar icon="pi pi-image" size="xlarge" shape="circle" />
@@ -78,6 +62,7 @@ export default function VideoCard({
           fill
           className="rounded-t-lg object-cover"
           onError={handleError}
+          onLoad={handleImageLoad}
         />
       </div>
     );
@@ -100,15 +85,7 @@ export default function VideoCard({
   // Footer buttons or spinners
   const footer = (
     <div className="flex justify-end gap-2 p-2">
-      {loading ? (
-        // show three small spinners as placeholders
-        [1, 2, 3].map((key) => (
-          <ProgressSpinner
-            key={key}
-            style={{ width: "2rem", height: "2rem" }}
-          />
-        ))
-      ) : (
+      {
         <>
           <Button
             icon="pi pi-play"
@@ -129,7 +106,7 @@ export default function VideoCard({
             onClick={() => onAddToWatchlist?.(video)}
           />
         </>
-      )}
+      }
     </div>
   );
 
@@ -139,10 +116,21 @@ export default function VideoCard({
       subTitle={subTitleContent}
       header={header}
       footer={footer}
-      className={`${className} w-full md:max-w-sm`}
+      className={`${className} relative w-full md:max-w-sm`}
     >
+      {!isLoaded && (
+        <div
+          className="absolute inset-0 z-30 flex items-center justify-center rounded-lg py-4"
+          style={{ backgroundColor: "var(--highlight-bg)" }}
+        >
+          <ProgressSpinner />
+        </div>
+      )}
       {loading ? (
-        <div className="flex justify-center py-4">
+        <div
+          className="absolute inset-0 z-30 flex items-center justify-center rounded-lg py-4"
+          style={{ backgroundColor: "var(--highlight-bg)" }}
+        >
           <ProgressSpinner />
         </div>
       ) : (
