@@ -8,6 +8,7 @@ import PropTypes from "prop-types";
 import { UserContext, User, UserContextType } from "../contexts/UserContext";
 
 let accessToken: string | null = null;
+let refreshAbortController: AbortController | null = null;
 
 export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [user, setUser] = useState<User | null>(null);
@@ -17,21 +18,32 @@ export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
   });
 
   const refreshToken = async () => {
+    refreshAbortController?.abort(); // cancel any previous refresh
+    refreshAbortController = new AbortController();
+
     try {
       const res = await axios.get<{ token: string }>("/api/auth/refresh", {
         withCredentials: true,
+        signal: refreshAbortController.signal,
       });
 
       accessToken = res.data.token;
 
       const me = await axios.get<User>("/api/users/me", {
         headers: { Authorization: `Bearer ${accessToken}` },
+        signal: refreshAbortController.signal,
       });
 
       setUser(me.data);
     } catch (err) {
-      console.warn("Token refresh failed, logging out…", err);
-      logout(); // ⬅️ Auto-logout on failure
+      if (axios.isCancel(err)) {
+        console.warn("Refresh request was cancelled");
+      } else {
+        console.warn("Token refresh failed, logging out…", err);
+        logout();
+      }
+    } finally {
+      refreshAbortController = null;
     }
   };
 
@@ -48,6 +60,8 @@ export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
   const logout = async () => {
     accessToken = null;
     setUser(null);
+    refreshAbortController?.abort(); // ✅ cancel any pending refresh
+    refreshAbortController = null;
     document.cookie = "refresh_token=; Max-Age=0; path=/;";
     try {
       await axios.post("/api/users/logout", null, { withCredentials: true });
