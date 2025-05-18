@@ -5,7 +5,8 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
 
-const JWT_SECRET = process.env.JWT_SECRET ?? "your-secret";
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) throw new Error("JWT_SECRET must be defined");
 
 // GET /api/users/me
 export async function GET(request: Request) {
@@ -13,7 +14,7 @@ export async function GET(request: Request) {
   if (!auth)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
-    const payload = jwt.verify(auth, JWT_SECRET) as { sub: string };
+    const payload = jwt.verify(auth, JWT_SECRET as string) as { sub: string };
     const user = await prisma.user.findUnique({
       where: { user_id: BigInt(payload.sub) },
     });
@@ -33,9 +34,13 @@ export async function POST(request: Request) {
   if (!match)
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
 
-  const token = jwt.sign({ sub: user.user_id.toString() }, JWT_SECRET, {
-    expiresIn: "1h",
-  });
+  const token = jwt.sign(
+    { sub: user.user_id.toString() },
+    JWT_SECRET as string,
+    {
+      expiresIn: "1h",
+    },
+  );
   return NextResponse.json({
     token,
     user: {

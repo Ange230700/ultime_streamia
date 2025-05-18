@@ -55,14 +55,14 @@ export default function Home() {
   // Show a global spinner while any category data is loading
   if (isAnyLoading) {
     return (
-      <div className="flex h-full items-center justify-center py-8">
+      <div className="flex h-full flex-1 items-center justify-center py-8">
         <ProgressSpinner />
       </div>
     );
   }
 
   return (
-    <div className="space-y-12 p-4">
+    <div className="flex-1 space-y-12 p-4">
       {categories.map((cat) => (
         <CategorySection
           key={cat.category_id}
