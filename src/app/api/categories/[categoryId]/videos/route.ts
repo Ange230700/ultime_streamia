@@ -1,10 +1,8 @@
 // src\app\api\categories\[categoryId]\videos\route.ts
 
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import type { Video } from "@/app/contexts/VideoContext";
-
-const prisma = new PrismaClient();
 
 // fetches both total count and paged videos for a category
 async function getVideosByCategory(

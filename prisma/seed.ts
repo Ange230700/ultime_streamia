@@ -1,10 +1,9 @@
 // prisma\seed.ts
 
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { faker } from "@faker-js/faker";
+import { prisma } from "@/lib/prisma";
 
-const prisma = new PrismaClient();
 const SALT_ROUNDS = 10;
 
 async function urlToBytes(url: string): Promise<Uint8Array> {
