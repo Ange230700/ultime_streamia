@@ -1,5 +1,5 @@
 // src/app/api/auth/refresh/route.ts
-import { NextResponse } from "next/server";
+import { success, error } from "@/utils/apiResponse";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
@@ -8,10 +8,7 @@ export async function GET() {
   const refreshToken = (await cookies()).get("refresh_token")?.value;
 
   if (!refreshToken) {
-    return NextResponse.json(
-      { error: "Missing refresh token" },
-      { status: 401 },
-    );
+    return error("Missing refresh token", 401);
   }
 
   try {
@@ -24,10 +21,7 @@ export async function GET() {
       where: { token_id: payload.jti },
     });
     if (!stored || new Date() > stored.expires_at) {
-      return NextResponse.json(
-        { error: "Refresh token invalid" },
-        { status: 403 },
-      );
+      return error("Refresh token invalid", 403);
     }
 
     const newAccessToken = jwt.sign(
@@ -38,12 +32,9 @@ export async function GET() {
       },
     );
 
-    return NextResponse.json({ token: newAccessToken });
+    return success({ token: newAccessToken }, 200);
   } catch (err) {
     console.error("Refresh token verification failed:", err);
-    return NextResponse.json(
-      { error: "Invalid refresh token" },
-      { status: 403 },
-    );
+    return error("Invalid refresh token", 403);
   }
 }

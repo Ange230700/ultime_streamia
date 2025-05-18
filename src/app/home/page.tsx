@@ -8,6 +8,8 @@ import { CategoryContext } from "@/app/contexts/CategoryContext";
 import { Video } from "@/app/contexts/VideoContext";
 import CategorySection from "@/app/components/CategorySection";
 import { ProgressSpinner } from "primereact/progressspinner";
+import type { ApiResponse } from "@/types/api-response";
+import { unwrapApi } from "@/utils/unwrapApi";
 
 export default function Home() {
   const { categories } = useContext(CategoryContext);
@@ -28,16 +30,18 @@ export default function Home() {
       setLoadingByCategory((prev) => ({ ...prev, [catId]: true }));
 
       axios
-        .get<{ videos: Video[]; total: number }>(
+        .get<ApiResponse<{ videos: Video[]; total: number }>>(
           `/api/categories/${catId}/videos`,
           { params: { offset: 0, limit: 10 } },
         )
         .then((res) => {
+          const data = unwrapApi(res.data);
           setVideosByCategory((prev) => ({
             ...prev,
-            [catId]: res.data.videos,
+            [catId]: data.videos,
           }));
         })
+
         .catch((err) => {
           console.error(`Failed to load videos for ${cat.category_name}`, err);
         })

@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { success } from "@/utils/apiResponse";
 import jwt from "jsonwebtoken";
 import { serialize } from "cookie";
 
@@ -17,7 +17,7 @@ export async function POST() {
     } catch {}
   }
 
-  const res = NextResponse.json({ message: "Logged out" });
+  const res = success({ message: "Logged out" }, 200);
 
   res.headers.set(
     "Set-Cookie",

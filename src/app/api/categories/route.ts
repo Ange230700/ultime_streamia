@@ -1,6 +1,6 @@
 // src\app\api\categories\route.ts
 
-import { NextResponse } from "next/server";
+import { success, error } from "@/utils/apiResponse";
 import { prisma } from "@/lib/prisma";
 import { createCategorySchema } from "@/schemas/categorySchemas";
 
@@ -11,7 +11,7 @@ export async function GET() {
     category_id: Number(cat.category_id),
     category_name: cat.category_name,
   }));
-  return NextResponse.json(safeCategories);
+  return success(safeCategories, 200);
 }
 
 // POST /api/categories
@@ -20,12 +20,9 @@ export async function POST(request: Request) {
   const result = createCategorySchema.safeParse(json);
 
   if (!result.success) {
-    return NextResponse.json(
-      { error: "Invalid category input", details: result.error.flatten() },
-      { status: 400 },
-    );
+    return error("Invalid category input", 400, result.error.flatten());
   }
   const { category_name } = result.data;
   const newCat = await prisma.category.create({ data: { category_name } });
-  return NextResponse.json(newCat, { status: 201 });
+  return success(newCat, 201);
 }

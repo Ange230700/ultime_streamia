@@ -6,6 +6,8 @@ import React, { useState, useEffect, useMemo } from "react";
 import type { ReactNode } from "react";
 import PropTypes from "prop-types";
 import { UserContext, User, UserContextType } from "../contexts/UserContext";
+import authAxios, { setAccessToken } from "@/lib/authAxios";
+import type { ApiResponse } from "@/types/api-response";
 
 let accessToken: string | null = null;
 let refreshAbortController: AbortController | null = null;
@@ -18,43 +20,45 @@ export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
   });
 
   const refreshToken = async () => {
-    refreshAbortController?.abort(); // cancel any previous refresh
+    refreshAbortController?.abort(); // Abort any existing request
     refreshAbortController = new AbortController();
 
-    try {
-      const res = await axios.get<{ token: string }>("/api/auth/refresh", {
-        withCredentials: true,
-        signal: refreshAbortController.signal,
-      });
+    const res = await authAxios.get<ApiResponse<{ token: string }>>(
+      "/api/auth/refresh",
+      { withCredentials: true, signal: refreshAbortController.signal },
+    );
 
-      accessToken = res.data.token;
+    if (res.data.success) {
+      accessToken = res.data.data.token;
+      setAccessToken(accessToken);
 
-      const me = await axios.get<User>("/api/users/me", {
+      const me = await authAxios.get<ApiResponse<User>>("/api/users/me", {
         headers: { Authorization: `Bearer ${accessToken}` },
         signal: refreshAbortController.signal,
       });
 
-      setUser(me.data);
-    } catch (err) {
-      if (axios.isCancel(err)) {
-        console.warn("Refresh request was cancelled");
+      if (me.data.success) {
+        setUser(me.data.data);
       } else {
-        console.warn("Token refresh failed, logging out…", err);
-        logout();
+        throw new Error(me.data.error);
       }
-    } finally {
-      refreshAbortController = null;
+    } else {
+      throw new Error(res.data.error);
     }
   };
 
   const login = async (email: string, password: string) => {
-    const res = await axios.post<{ token: string; user: User }>(
-      "/api/users/login",
-      { email, password },
-      { withCredentials: true },
-    );
-    accessToken = res.data.token;
-    setUser(res.data.user);
+    const res = await authAxios.post<
+      ApiResponse<{ token: string; user: User }>
+    >("/api/users/login", { email, password }, { withCredentials: true });
+
+    if (res.data.success) {
+      accessToken = res.data.data.token;
+      setAccessToken(accessToken);
+      setUser(res.data.data.user);
+    } else {
+      throw new Error(res.data.error);
+    }
   };
 
   const logout = async () => {

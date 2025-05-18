@@ -10,6 +10,7 @@ import {
   Category,
   CategoryContextType,
 } from "@/app/contexts/CategoryContext";
+import type { ApiResponse } from "@/types/api-response";
 
 export function CategoryProvider({
   children,
@@ -17,11 +18,12 @@ export function CategoryProvider({
   const [categories, setCategories] = useState<Category[]>([]);
 
   const refreshCategories = useCallback(async () => {
-    try {
-      const res = await axios.get<Category[]>("/api/categories");
-      setCategories(res.data);
-    } catch (err) {
-      console.error("Failed to fetch categories:", err);
+    const res = await axios.get<ApiResponse<Category[]>>("/api/categories");
+
+    if (res.data.success) {
+      setCategories(res.data.data);
+    } else {
+      console.error("Failed to fetch categories:", res.data.error);
     }
   }, []);
 

@@ -1,6 +1,6 @@
 // src\app\api\videos\route.ts
 
-import { NextResponse } from "next/server";
+import { success } from "@/utils/apiResponse";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/videos
@@ -49,12 +49,12 @@ export async function GET(request: Request) {
     })),
   }));
 
-  return NextResponse.json({ videos: payload, total });
+  return success({ videos: payload, total }, 200);
 }
 
 // POST /api/videos
 export async function POST(request: Request) {
   const data = await request.json();
   const newVideo = await prisma.video.create({ data });
-  return NextResponse.json(newVideo, { status: 201 });
+  return success(newVideo, 201);
 }

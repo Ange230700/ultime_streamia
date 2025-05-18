@@ -1,7 +1,7 @@
 // src\app\api\users\login\route.ts
 
 import { serialize } from "cookie";
-import { NextResponse } from "next/server";
+import { success, error } from "@/utils/apiResponse";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
@@ -15,16 +15,13 @@ export async function POST(request: Request) {
   const result = loginSchema.safeParse(body);
 
   if (!result.success) {
-    return NextResponse.json(
-      { error: "Invalid input", details: result.error.flatten() },
-      { status: 400 },
-    );
+    return error("Invalid input", 400, result.error.flatten());
   }
 
   const { email, password } = result.data;
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user || !(await bcrypt.compare(password, user.password))) {
-    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    return error("Invalid credentials", 401);
   }
 
   const userId = user.user_id.toString();
@@ -49,15 +46,18 @@ export async function POST(request: Request) {
   });
 
   // Set refresh token as HttpOnly cookie
-  const res = NextResponse.json({
-    token: accessToken,
-    user: {
-      user_id: Number(user.user_id),
-      username: user.username,
-      email: user.email,
-      is_admin: user.is_admin,
+  const res = success(
+    {
+      token: accessToken,
+      user: {
+        user_id: Number(user.user_id),
+        username: user.username,
+        email: user.email,
+        is_admin: user.is_admin,
+      },
     },
-  });
+    200,
+  );
 
   res.headers.set(
     "Set-Cookie",

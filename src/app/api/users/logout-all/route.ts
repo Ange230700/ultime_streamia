@@ -2,14 +2,13 @@
 
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { success } from "@/utils/apiResponse";
 import jwt from "jsonwebtoken";
 import { serialize } from "cookie";
 
 export async function POST() {
   const token = (await cookies()).get("refresh_token")?.value;
-  if (!token)
-    return NextResponse.json({ message: "No session" }, { status: 204 });
+  if (!token) return success({ message: "No session" }, 200);
 
   try {
     const { sub } = jwt.verify(token, process.env.JWT_SECRET!) as {
@@ -18,7 +17,7 @@ export async function POST() {
     await prisma.refresh_token.deleteMany({ where: { user_id: BigInt(sub) } });
   } catch {}
 
-  const res = NextResponse.json({ message: "Logged out from all devices" });
+  const res = success({ message: "Logged out from all devices" }, 200);
   res.headers.set(
     "Set-Cookie",
     serialize("refresh_token", "", {

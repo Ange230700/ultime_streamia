@@ -1,6 +1,7 @@
 // src\app\api\categories\[categoryId]\videos\route.ts
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { success, error } from "@/utils/apiResponse";
 import { prisma } from "@/lib/prisma";
 import type { Video } from "@/app/contexts/VideoContext";
 
@@ -70,12 +71,9 @@ export async function GET(
       offset,
       limit,
     );
-    return NextResponse.json({ videos, total });
+    return success({ videos, total }, 200);
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { message: "Failed to load videos for category" },
-      { status: 500 },
-    );
+    return error("Failed to load videos for category", 500);
   }
 }
