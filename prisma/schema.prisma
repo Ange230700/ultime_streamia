@@ -57,16 +57,17 @@ model favorite {
 }
 
 model user {
-  user_id   BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
-  username  String      @db.VarChar(255)
-  email     String      @unique(map: "user_email_unique") @db.VarChar(255)
-  password  String      @db.VarChar(255)
-  is_admin  Boolean     @default(false)
-  avatar_id BigInt      @db.UnsignedBigInt
-  comment   comment[]
-  favorite  favorite[]
-  avatar    avatar      @relation(fields: [avatar_id], references: [avatar_id], onUpdate: Restrict, map: "user_avatar_id_foreign")
-  watchlist watchlist[]
+  user_id       BigInt          @id @default(autoincrement()) @db.UnsignedBigInt
+  username      String          @db.VarChar(255)
+  email         String          @unique(map: "user_email_unique") @db.VarChar(255)
+  password      String          @db.VarChar(255)
+  is_admin      Boolean         @default(false)
+  avatar_id     BigInt          @db.UnsignedBigInt
+  comment       comment[]
+  favorite      favorite[]
+  avatar        avatar          @relation(fields: [avatar_id], references: [avatar_id], onUpdate: Restrict, map: "user_avatar_id_foreign")
+  watchlist     watchlist[]
+  refresh_token refresh_token[]
 
   @@index([avatar_id], map: "user_avatar_id_foreign")
 }
@@ -106,4 +107,14 @@ model watchlist_video {
 
   @@index([video_id], map: "watchlist_video_video_id_foreign")
   @@index([watchlist_id], map: "watchlist_video_watchlist_id_foreign")
+}
+
+model refresh_token {
+  token_id   String   @id
+  user_id    BigInt   @db.UnsignedBigInt
+  issued_at  DateTime @default(now())
+  expires_at DateTime
+  user       user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@index([user_id])
 }

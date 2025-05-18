@@ -1,24 +1,24 @@
-// src\app\api\users\logout\route.ts
+// src\app\api\users\logout-all\route.ts
 
-import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { serialize } from "cookie";
 
 export async function POST() {
   const token = (await cookies()).get("refresh_token")?.value;
-  if (token) {
-    try {
-      const { jti } = jwt.verify(token, process.env.JWT_SECRET!) as {
-        jti: string;
-      };
-      await prisma.refresh_token.delete({ where: { token_id: jti } });
-    } catch {}
-  }
+  if (!token)
+    return NextResponse.json({ message: "No session" }, { status: 204 });
 
-  const res = NextResponse.json({ message: "Logged out" });
+  try {
+    const { sub } = jwt.verify(token, process.env.JWT_SECRET!) as {
+      sub: string;
+    };
+    await prisma.refresh_token.deleteMany({ where: { user_id: BigInt(sub) } });
+  } catch {}
 
+  const res = NextResponse.json({ message: "Logged out from all devices" });
   res.headers.set(
     "Set-Cookie",
     serialize("refresh_token", "", {
@@ -26,9 +26,8 @@ export async function POST() {
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
-      maxAge: 0, // Delete cookie
+      maxAge: 0,
     }),
   );
-
   return res;
 }

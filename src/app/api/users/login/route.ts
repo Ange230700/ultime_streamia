@@ -31,8 +31,21 @@ export async function POST(request: Request) {
   const accessToken = jwt.sign({ sub: userId }, JWT_SECRET as string, {
     expiresIn: "15m",
   });
-  const refreshToken = jwt.sign({ sub: userId }, JWT_SECRET as string, {
-    expiresIn: "7d",
+  const refreshTokenId = crypto.randomUUID();
+  const refreshToken = jwt.sign(
+    { sub: userId, jti: refreshTokenId },
+    JWT_SECRET as string,
+    {
+      expiresIn: "7d",
+    },
+  );
+
+  await prisma.refresh_token.create({
+    data: {
+      token_id: refreshTokenId,
+      user_id: user.user_id,
+      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    },
   });
 
   // Set refresh token as HttpOnly cookie
