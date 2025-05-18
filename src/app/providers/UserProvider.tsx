@@ -14,21 +14,24 @@ export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
 
   useEffect(() => {
     refreshToken(); // Try refreshing on load
-  }, []);
+  });
 
   const refreshToken = async () => {
     try {
       const res = await axios.get<{ token: string }>("/api/auth/refresh", {
         withCredentials: true,
       });
+
       accessToken = res.data.token;
+
       const me = await axios.get<User>("/api/users/me", {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
+
       setUser(me.data);
-    } catch {
-      accessToken = null;
-      setUser(null);
+    } catch (err) {
+      console.warn("Token refresh failed, logging out…", err);
+      logout(); // ⬅️ Auto-logout on failure
     }
   };
 
@@ -42,10 +45,13 @@ export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
     setUser(res.data.user);
   };
 
-  const logout = () => {
+  const logout = async () => {
     accessToken = null;
     setUser(null);
     document.cookie = "refresh_token=; Max-Age=0; path=/;";
+    try {
+      await axios.post("/api/users/logout", null, { withCredentials: true });
+    } catch {}
   };
 
   const value = useMemo<UserContextType>(
