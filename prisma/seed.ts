@@ -1,4 +1,4 @@
-// prisma\seed.js
+// prisma\seed.ts
 
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
@@ -58,20 +58,44 @@ async function main() {
 
   // 5. Create Videos
   const videos = await Promise.all(
-    Array.from({ length: 20 }).map(() =>
-      prisma.video.create({
+    Array.from({ length: 20 }).map(() => {
+      const cardUri = faker.image.dataUri({
+        width: 384,
+        height: 216,
+        type: "svg-base64",
+      });
+
+      const coverUri = faker.image.dataUri({
+        width: 384,
+        height: 216,
+        type: "svg-base64",
+      });
+
+      function dataUriToBytes(uri: string): Uint8Array {
+        // split off the `data:…;base64,` prefix:
+        const parts = uri.split(",");
+        if (parts.length < 2) {
+          throw new Error(
+            `Invalid data URI, no base64 payload found in: ${uri}`,
+          );
+        }
+        // parts[1] is now definitely defined
+        return Buffer.from(parts[1], "base64");
+      }
+
+      return prisma.video.create({
         data: {
           video_title: faker.lorem.words(3),
           video_description: faker.lorem.paragraph(),
-          card_image_data: null,
-          cover_image_data: null,
+          card_image_data: dataUriToBytes(cardUri),
+          cover_image_data: dataUriToBytes(coverUri),
           video_data: null,
           video_duration: faker.date.recent(),
           release_date: faker.date.past(),
           is_available: faker.datatype.boolean(),
         },
-      }),
-    ),
+      });
+    }),
   );
 
   // 6. Link videos to random categories

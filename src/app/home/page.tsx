@@ -7,6 +7,7 @@ import axios from "axios";
 import { CategoryContext } from "@/app/contexts/CategoryContext";
 import { Video } from "@/app/contexts/VideoContext";
 import CategorySection from "@/app/components/CategorySection";
+import { ProgressSpinner } from "primereact/progressspinner";
 
 export default function Home() {
   const { categories } = useContext(CategoryContext);
@@ -45,6 +46,20 @@ export default function Home() {
         });
     });
   }, [categories]);
+
+  // Determine if any category is still loading
+  const isAnyLoading = categories.some(
+    (cat) => loadingByCategory[cat.category_id],
+  );
+
+  // Show a global spinner while any category data is loading
+  if (isAnyLoading) {
+    return (
+      <div className="flex h-full items-center justify-center py-8">
+        <ProgressSpinner />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-12 p-4">
