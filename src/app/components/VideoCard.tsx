@@ -30,9 +30,15 @@ export default function VideoCard({
   loading = false,
 }: Readonly<VideoCardProps>) {
   const [imgError, setImgError] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const handleError = () => setImgError(true);
+  const hasImage = Boolean(video.cover_image_data);
+  const [isLoaded, setIsLoaded] = useState(!hasImage);
   const handleImageLoad = () => setIsLoaded(true);
+
+  // if loading the <Image> ever errors, also consider it loaded
+  const _handleError = () => {
+    setImgError(true);
+    setIsLoaded(true);
+  };
 
   // Title or spinner
   const title = video.video_title;
@@ -61,7 +67,7 @@ export default function VideoCard({
           src={`data:image/jpeg;base64,${video.cover_image_data}`}
           fill
           className="rounded-t-lg object-cover"
-          onError={handleError}
+          onError={_handleError}
           onLoad={handleImageLoad}
         />
       </div>
@@ -118,7 +124,7 @@ export default function VideoCard({
       footer={footer}
       className={`${className} relative w-full md:max-w-sm`}
     >
-      {!isLoaded && (
+      {hasImage && !isLoaded && (
         <div
           className="absolute inset-0 z-30 flex items-center justify-center rounded-lg py-4"
           style={{ backgroundColor: "var(--highlight-bg)" }}
