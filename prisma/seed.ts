@@ -7,6 +7,13 @@ import { faker } from "@faker-js/faker";
 const prisma = new PrismaClient();
 const SALT_ROUNDS = 10;
 
+async function urlToBytes(url: string): Promise<Uint8Array> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
+  const arrayBuffer = await res.arrayBuffer();
+  return Buffer.from(arrayBuffer);
+}
+
 async function main() {
   console.log("Start seeding...");
 
@@ -21,11 +28,15 @@ async function main() {
   await prisma.user.deleteMany();
   await prisma.avatar.deleteMany();
 
-  // 2. Create some avatars (just null blobs for now)
+  // 2. Create some avatars
   const avatars = await Promise.all(
-    Array.from({ length: 10 }).map(() =>
-      prisma.avatar.create({ data: { image_data: null } }),
-    ),
+    Array.from({ length: 10 }).map(async () => {
+      const avatarUrl = faker.image.avatar();
+      const imageData = await urlToBytes(avatarUrl);
+      return prisma.avatar.create({
+        data: { image_data: imageData },
+      });
+    }),
   );
 
   // 3. Create some users
