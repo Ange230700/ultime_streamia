@@ -69,6 +69,7 @@ export default function VideoCard({
           className="rounded-t-lg object-cover"
           onError={_handleError}
           onLoad={handleImageLoad}
+          loading="lazy"
         />
       </div>
     );
