@@ -5,12 +5,23 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
+import { loginSchema } from "@/schemas/userSchemas";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) throw new Error("JWT_SECRET must be defined");
 
 export async function POST(request: Request) {
-  const { email, password } = await request.json();
+  const body = await request.json();
+  const result = loginSchema.safeParse(body);
+
+  if (!result.success) {
+    return NextResponse.json(
+      { error: "Invalid input", details: result.error.flatten() },
+      { status: 400 },
+    );
+  }
+
+  const { email, password } = result.data;
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user || !(await bcrypt.compare(password, user.password))) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
