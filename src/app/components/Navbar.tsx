@@ -9,6 +9,7 @@ import { Menubar } from "primereact/menubar";
 import { InputText } from "primereact/inputtext";
 import { MenuItem } from "primereact/menuitem";
 import { Button } from "primereact/button";
+import { useTheme } from "@/app/contexts/ThemeContext";
 
 type NavbarMenuItem = MenuItem & {
   label?: string;
@@ -16,6 +17,7 @@ type NavbarMenuItem = MenuItem & {
 };
 
 export default function Navbar() {
+  const { theme, toggle } = useTheme();
   const router = useRouter();
   const items: NavbarMenuItem[] = [
     {
@@ -36,6 +38,12 @@ export default function Navbar() {
         placeholder="Search"
         type="text"
         className="w-8rem sm:w-auto"
+      />
+      <Button
+        icon={theme === "dark" ? "pi pi-sun" : "pi pi-moon"}
+        rounded
+        aria-label="Toggle theme"
+        onClick={toggle}
       />
       <Button icon="pi pi-user" rounded aria-label="User" />
     </div>

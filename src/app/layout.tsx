@@ -2,6 +2,7 @@
 
 import React from "react";
 import type { Metadata } from "next";
+import Head from "next/head";
 import { PrimeReactProvider } from "primereact/api";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
@@ -12,6 +13,7 @@ import Footer from "@/app/components/Footer";
 import { VideoProvider } from "@/app/providers/VideoProvider";
 import { CategoryProvider } from "@/app/providers/CategoryProvider";
 import { UserProvider } from "@/app/providers/UserProvider";
+import { ThemeProvider, useTheme } from "@/app/contexts/ThemeContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,24 +35,34 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { theme } = useTheme();
   return (
     <html lang="en">
+      <Head>
+        <link
+          key={theme}
+          rel="stylesheet"
+          href={`/themes/soho-${theme}/theme.css`}
+        />
+      </Head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
-        <PrimeReactProvider>
-          <UserProvider>
-            <header>
-              <Navbar />
-            </header>
-            <main className="flex flex-1 flex-col">
-              <CategoryProvider>
-                <VideoProvider>{children}</VideoProvider>
-              </CategoryProvider>
-            </main>
-            <Footer />
-          </UserProvider>
-        </PrimeReactProvider>
+        <ThemeProvider>
+          <PrimeReactProvider>
+            <UserProvider>
+              <header>
+                <Navbar />
+              </header>
+              <main className="flex flex-1 flex-col">
+                <CategoryProvider>
+                  <VideoProvider>{children}</VideoProvider>
+                </CategoryProvider>
+              </main>
+              <Footer />
+            </UserProvider>
+          </PrimeReactProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
