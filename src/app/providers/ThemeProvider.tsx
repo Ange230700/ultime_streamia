@@ -1,5 +1,7 @@
 // src\app\providers\ThemeProvider.tsx
 
+"use client";
+
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Theme } from "@/types/theme";
 import { ThemeContext } from "@/app/contexts/ThemeContext";

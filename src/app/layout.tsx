@@ -2,7 +2,6 @@
 
 import React from "react";
 import type { Metadata } from "next";
-import Head from "next/head";
 import { PrimeReactProvider } from "primereact/api";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
@@ -14,7 +13,7 @@ import { VideoProvider } from "@/app/providers/VideoProvider";
 import { CategoryProvider } from "@/app/providers/CategoryProvider";
 import { UserProvider } from "@/app/providers/UserProvider";
 import { ThemeProvider } from "@/app/providers/ThemeProvider";
-import { useTheme } from "@/app/hooks/useTheme";
+import ThemeStyles from "@/app/components/ThemeStyles";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,20 +35,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { theme } = useTheme();
   return (
     <html lang="en">
-      <Head>
-        <link
-          key={theme}
-          rel="stylesheet"
-          href={`/themes/soho-${theme}/theme.css`}
-        />
-      </Head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
         <ThemeProvider>
+          <ThemeStyles />
           <PrimeReactProvider>
             <UserProvider>
               <header>
