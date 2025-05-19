@@ -5,7 +5,6 @@ import type { Metadata } from "next";
 import { PrimeReactProvider } from "primereact/api";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
-import "primereact/resources/themes/soho-dark/theme.css";
 import "primeicons/primeicons.css";
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
