@@ -1,6 +1,10 @@
 // src\lib\authAxios.ts
 
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
+import axiosRetry, {
+  exponentialDelay,
+  isNetworkOrIdempotentRequestError,
+} from "axios-retry";
 
 let accessToken: string | null = null;
 let isRefreshing = false;
@@ -63,7 +67,9 @@ authAxios.interceptors.response.use(
         return authAxios(originalRequest);
       } catch (err) {
         requestQueue = [];
-        return Promise.reject(err);
+        return Promise.reject(
+          err instanceof Error ? err : new Error(String(err)),
+        );
       } finally {
         isRefreshing = false;
       }
@@ -72,5 +78,13 @@ authAxios.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+axiosRetry(authAxios, {
+  retries: 2,
+  retryDelay: exponentialDelay,
+  retryCondition: (error) =>
+    isNetworkOrIdempotentRequestError(error) ||
+    (error.response?.status ?? 0) >= 500,
+});
 
 export default authAxios;

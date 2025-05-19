@@ -1,7 +1,7 @@
 // src\app\providers\VideoProvider.tsx
 
 "use client";
-import axios from "axios";
+
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
 import PropTypes from "prop-types";
@@ -10,7 +10,7 @@ import {
   Video,
   VideoContextType,
 } from "@/app/contexts/VideoContext";
-import { retry } from "@/utils/retry";
+import http from "@/lib/http";
 
 interface VideosResponse {
   videos: Video[];
@@ -36,11 +36,9 @@ export function VideoProvider({ children }: Readonly<{ children: ReactNode }>) {
       if (params?.categoryId != null) {
         query.categoryId = params.categoryId;
       }
-      const res = await await retry(
-        () => axios.get<VideosResponse>("/api/videos", { params: query }),
-        3, // number of retries
-        500, // base delay in ms (will back off exponentially)
-      );
+      const res = await http.get<VideosResponse>("/api/videos", {
+        params: query,
+      });
 
       const { videos, total } = res.data;
       setTotalCount(total);
