@@ -40,7 +40,7 @@ async function main() {
       const avatar = faker.helpers.arrayElement(avatars);
       return prisma.user.create({
         data: {
-          username: faker.internet.userName(),
+          username: faker.internet.username(),
           email: faker.internet.email(),
           password: hash,
           is_admin: faker.datatype.boolean(0.1),

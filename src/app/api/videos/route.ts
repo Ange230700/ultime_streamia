@@ -1,5 +1,7 @@
 // src\app\api\videos\route.ts
 
+import { withValidation } from "@/lib/withValidation";
+import { createVideoSchema, CreateVideoInput } from "@/schemas/videoSchemas";
 import { success } from "@/utils/apiResponse";
 import { prisma } from "@/lib/prisma";
 
@@ -53,8 +55,17 @@ export async function GET(request: Request) {
 }
 
 // POST /api/videos
-export async function POST(request: Request) {
-  const data = await request.json();
-  const newVideo = await prisma.video.create({ data });
+async function handleCreateVideo(request: Request, data: CreateVideoInput) {
+  const newVideo = await prisma.video.create({
+    data: {
+      video_title: data.video_title,
+      video_description: data.video_description,
+      is_available: data.is_available ?? true,
+      release_date: new Date(),
+      // …map other fields
+    },
+  });
   return success(newVideo, 201);
 }
+
+export const POST = withValidation(createVideoSchema, handleCreateVideo);

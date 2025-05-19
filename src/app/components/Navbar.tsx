@@ -9,7 +9,7 @@ import { Menubar } from "primereact/menubar";
 import { InputText } from "primereact/inputtext";
 import { MenuItem } from "primereact/menuitem";
 import { Button } from "primereact/button";
-import { useTheme } from "@/app/contexts/ThemeContext";
+import { useTheme } from "@/app/hooks/useTheme";
 
 type NavbarMenuItem = MenuItem & {
   label?: string;

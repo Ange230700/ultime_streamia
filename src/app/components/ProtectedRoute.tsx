@@ -14,7 +14,7 @@ export interface ProtectedRouteProps {
 export default function ProtectedRoute({
   requireAdmin = false,
   children,
-}: ProtectedRouteProps) {
+}: Readonly<ProtectedRouteProps>) {
   const { user } = useUser();
   const router = useRouter();
 

@@ -13,11 +13,11 @@ export interface User {
 export interface UserContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 export const UserContext = createContext<UserContextType>({
   user: null,
   login: async () => {},
-  logout: () => {},
+  logout: async () => {},
 });

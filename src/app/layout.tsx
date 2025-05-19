@@ -13,7 +13,8 @@ import Footer from "@/app/components/Footer";
 import { VideoProvider } from "@/app/providers/VideoProvider";
 import { CategoryProvider } from "@/app/providers/CategoryProvider";
 import { UserProvider } from "@/app/providers/UserProvider";
-import { ThemeProvider, useTheme } from "@/app/contexts/ThemeContext";
+import { ThemeProvider } from "@/app/providers/ThemeProvider";
+import { useTheme } from "@/app/hooks/useTheme";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

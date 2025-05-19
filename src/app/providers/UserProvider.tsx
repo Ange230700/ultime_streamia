@@ -64,7 +64,7 @@ export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
   const logout = async () => {
     accessToken = null;
     setUser(null);
-    refreshAbortController?.abort(); // ✅ cancel any pending refresh
+    refreshAbortController?.abort();
     refreshAbortController = null;
     document.cookie = "refresh_token=; Max-Age=0; path=/;";
     try {

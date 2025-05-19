@@ -1,8 +1,12 @@
 // src\app\api\categories\route.ts
 
-import { success, error } from "@/utils/apiResponse";
+import { withValidation } from "@/lib/withValidation";
+import {
+  createCategorySchema,
+  CreateCategoryInput,
+} from "@/schemas/categorySchemas";
+import { success } from "@/utils/apiResponse";
 import { prisma } from "@/lib/prisma";
-import { createCategorySchema } from "@/schemas/categorySchemas";
 
 // GET /api/categories
 export async function GET() {
@@ -15,14 +19,14 @@ export async function GET() {
 }
 
 // POST /api/categories
-export async function POST(request: Request) {
-  const json = await request.json();
-  const result = createCategorySchema.safeParse(json);
-
-  if (!result.success) {
-    return error("Invalid category input", 400, result.error.flatten());
-  }
-  const { category_name } = result.data;
-  const newCat = await prisma.category.create({ data: { category_name } });
+async function handleCreateCategory(
+  request: Request,
+  data: CreateCategoryInput,
+) {
+  const newCat = await prisma.category.create({
+    data: { category_name: data.category_name },
+  });
   return success(newCat, 201);
 }
+
+export const POST = withValidation(createCategorySchema, handleCreateCategory);

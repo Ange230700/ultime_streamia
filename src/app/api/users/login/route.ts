@@ -4,21 +4,20 @@ import { serialize } from "cookie";
 import { success, error } from "@/utils/apiResponse";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
-import { loginSchema } from "@/schemas/userSchemas";
+import { withValidation } from "@/lib/withValidation";
+import { loginSchema, LoginInput } from "@/schemas/userSchemas";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) throw new Error("JWT_SECRET must be defined");
 
-export async function POST(request: Request) {
-  const body = await request.json();
-  const result = loginSchema.safeParse(body);
+/**
+ * Handler for user login. Assumes data has been validated by withValidation.
+ */
+async function handleLogin(request: Request, data: LoginInput) {
+  const { email, password } = data;
 
-  if (!result.success) {
-    return error("Invalid input", 400, result.error.flatten());
-  }
-
-  const { email, password } = result.data;
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user || !(await bcrypt.compare(password, user.password))) {
     return error("Invalid credentials", 401);
@@ -28,24 +27,24 @@ export async function POST(request: Request) {
   const accessToken = jwt.sign({ sub: userId }, JWT_SECRET as string, {
     expiresIn: "15m",
   });
+
   const refreshTokenId = crypto.randomUUID();
   const refreshToken = jwt.sign(
     { sub: userId, jti: refreshTokenId },
     JWT_SECRET as string,
-    {
-      expiresIn: "7d",
-    },
+    { expiresIn: "7d" },
   );
 
+  // Store refresh token in DB
   await prisma.refresh_token.create({
     data: {
       token_id: refreshTokenId,
       user_id: user.user_id,
-      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     },
   });
 
-  // Set refresh token as HttpOnly cookie
+  // Prepare response with access token and user info
   const res = success(
     {
       token: accessToken,
@@ -59,6 +58,7 @@ export async function POST(request: Request) {
     200,
   );
 
+  // Set refresh token as a secure, HttpOnly cookie
   res.headers.set(
     "Set-Cookie",
     serialize("refresh_token", refreshToken, {
@@ -72,3 +72,6 @@ export async function POST(request: Request) {
 
   return res;
 }
+
+// Export POST handler wrapped with validation
+export const POST = withValidation(loginSchema, handleLogin);
