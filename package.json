@@ -19,6 +19,7 @@
     "cookie": "^1.0.2",
     "jsonwebtoken": "^9.0.2",
     "next": "15.3.2",
+    "node-fetch": "^3.3.2",
     "primeicons": "^7.0.0",
     "primereact": "^10.9.5",
     "prop-types": "^15.8.1",

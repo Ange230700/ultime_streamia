@@ -3,59 +3,53 @@
 import bcrypt from "bcrypt";
 import { faker } from "@faker-js/faker";
 import { prisma } from "@/lib/prisma";
+import { urlToBytes, dataUriToBytes } from "@/utils/seedUtils";
 
 const SALT_ROUNDS = 10;
 
-async function urlToBytes(url: string): Promise<Uint8Array> {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
-  const arrayBuffer = await res.arrayBuffer();
-  return Buffer.from(arrayBuffer);
-}
-
 async function main() {
-  console.log("Start seeding...");
+  console.log("🌱 Start seeding...");
 
   // 1. Clean up in the right order
-  await prisma.watchlist_video.deleteMany();
-  await prisma.watchlist.deleteMany();
-  await prisma.favorite.deleteMany();
-  await prisma.comment.deleteMany();
-  await prisma.category_video.deleteMany();
-  await prisma.video.deleteMany();
-  await prisma.category.deleteMany();
-  await prisma.user.deleteMany();
-  await prisma.avatar.deleteMany();
+  await Promise.all([
+    prisma.watchlist_video.deleteMany(),
+    prisma.watchlist.deleteMany(),
+    prisma.favorite.deleteMany(),
+    prisma.comment.deleteMany(),
+    prisma.category_video.deleteMany(),
+    prisma.video.deleteMany(),
+    prisma.category.deleteMany(),
+    prisma.user.deleteMany(),
+    prisma.avatar.deleteMany(),
+  ]);
 
   // 2. Create some avatars
   const avatars = await Promise.all(
     Array.from({ length: 10 }).map(async () => {
-      const avatarUrl = faker.image.avatar();
-      const imageData = await urlToBytes(avatarUrl);
-      return prisma.avatar.create({
-        data: { image_data: imageData },
-      });
+      const bytes = await urlToBytes(faker.image.avatar());
+      return prisma.avatar.create({ data: { image_data: bytes } });
     }),
   );
+  console.log(`✔️  Created ${avatars.length} avatars`);
 
   // 3. Create some users
   const users = await Promise.all(
     Array.from({ length: 20 }).map(async () => {
-      const plainPassword = faker.internet.password({ length: 12 });
-      const passwordHash = await bcrypt.hash(plainPassword, SALT_ROUNDS);
+      const plain = faker.internet.password({ length: 12 });
+      const hash = await bcrypt.hash(plain, SALT_ROUNDS);
       const avatar = faker.helpers.arrayElement(avatars);
-
       return prisma.user.create({
         data: {
-          username: faker.internet.username(),
+          username: faker.internet.userName(),
           email: faker.internet.email(),
-          password: passwordHash,
-          is_admin: faker.datatype.boolean(0.1), // ~10% admins
+          password: hash,
+          is_admin: faker.datatype.boolean(0.1),
           avatar_id: avatar.avatar_id,
         },
       });
     }),
   );
+  console.log(`✔️  Created ${users.length} users`);
 
   // Create Categories
   const categories = await Promise.all(
@@ -65,6 +59,7 @@ async function main() {
       }),
     ),
   );
+  console.log(`✔️  Created ${categories.length} categories`);
 
   // 5. Create Videos
   const videos = await Promise.all(
@@ -81,18 +76,6 @@ async function main() {
         type: "svg-base64",
       });
 
-      function dataUriToBytes(uri: string): Uint8Array {
-        // split off the `data:…;base64,` prefix:
-        const parts = uri.split(",");
-        if (parts.length < 2) {
-          throw new Error(
-            `Invalid data URI, no base64 payload found in: ${uri}`,
-          );
-        }
-        // parts[1] is now definitely defined
-        return Buffer.from(parts[1], "base64");
-      }
-
       return prisma.video.create({
         data: {
           video_title: faker.lorem.words(3),
@@ -107,6 +90,7 @@ async function main() {
       });
     }),
   );
+  console.log(`✔️  Created ${videos.length} videos`);
 
   // 6. Link videos to random categories
   for (const video of videos) {
@@ -118,65 +102,74 @@ async function main() {
       });
     }
   }
+  console.log(`✔️  Linked videos to categories`);
 
   // 7. Create comments
-  for (let i = 0; i < 50; i++) {
-    await prisma.comment.create({
-      data: {
-        user_id:
-          users[faker.number.int({ min: 0, max: users.length - 1 })].user_id,
-        video_id:
-          videos[faker.number.int({ min: 0, max: videos.length - 1 })].video_id,
-        comment_content: faker.lorem.sentences(2),
-        written_at: faker.date.recent(),
-      },
-    });
-  }
+  const commentCreations = await Promise.all(
+    Array.from({ length: 50 }).map(() =>
+      prisma.comment.create({
+        data: {
+          user_id: faker.helpers.arrayElement(users).user_id,
+          video_id: faker.helpers.arrayElement(videos).video_id,
+          comment_content: faker.lorem.sentences(2),
+          written_at: faker.date.recent(),
+        },
+      }),
+    ),
+  );
+  console.log(`✔️  Created ${commentCreations.length} comments`);
 
   // 8. Create favorites
-  for (let i = 0; i < 50; i++) {
-    await prisma.favorite.create({
-      data: {
-        user_id:
-          users[faker.number.int({ min: 0, max: users.length - 1 })].user_id,
-        video_id:
-          videos[faker.number.int({ min: 0, max: videos.length - 1 })].video_id,
-      },
-    });
-  }
+  const favoriteCreations = await Promise.all(
+    Array.from({ length: 50 }).map(() =>
+      prisma.favorite.create({
+        data: {
+          user_id: faker.helpers.arrayElement(users).user_id,
+          video_id: faker.helpers.arrayElement(videos).video_id,
+        },
+      }),
+    ),
+  );
+  console.log(`✔️  Created ${favoriteCreations.length} favorites`);
 
   // 9. Create watchlists and watchlist_video
   const watchlists = await Promise.all(
-    users.map((user) => {
-      const randomVideo =
-        videos[faker.number.int({ min: 0, max: videos.length - 1 })];
-      return prisma.watchlist.create({
+    users.map((user) =>
+      prisma.watchlist.create({
         data: {
           user_id: user.user_id,
-          video_id: randomVideo.video_id,
+          video_id: faker.helpers.arrayElement(videos).video_id,
         },
-      });
+      }),
+    ),
+  );
+  console.log(`✔️  Created ${watchlists.length} watchlists`);
+
+  await Promise.all(
+    watchlists.map((wl) => {
+      const vids = faker.helpers
+        .shuffle(videos)
+        .slice(0, faker.number.int({ min: 1, max: 5 }));
+      return Promise.all(
+        vids.map((vid) =>
+          prisma.watchlist_video.create({
+            data: {
+              watchlist_id: wl.watchlist_id,
+              video_id: vid.video_id,
+            },
+          }),
+        ),
+      );
     }),
   );
+  console.log(`✔️  Linked videos into watchlists`);
 
-  // Link Watchlists to Videos
-  for (const list of watchlists) {
-    const selectedVideos = faker.helpers
-      .shuffle(videos)
-      .slice(0, faker.number.int({ min: 1, max: 5 }));
-    for (const vid of selectedVideos) {
-      await prisma.watchlist_video.create({
-        data: { watchlist_id: list.watchlist_id, video_id: vid.video_id },
-      });
-    }
-  }
-
-  console.log("🌱 Database has been seeded with Faker data!");
+  console.log("🎉 Database has been seeded!");
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error("❌ Seed failed:", e);
     process.exit(1);
   })
   .finally(async () => {
