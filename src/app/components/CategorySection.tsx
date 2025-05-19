@@ -4,9 +4,10 @@
 
 import React from "react";
 import { Carousel, CarouselResponsiveOption } from "primereact/carousel";
-import { ProgressSpinner } from "primereact/progressspinner";
 import { Video } from "@/app/contexts/VideoContext";
 import VideoCard from "@/app/components/VideoCard";
+import SkeletonVideoCard from "@/app/components/SkeletonVideoCard";
+import clsx from "clsx";
 
 export interface CategorySectionProps {
   title: string;
@@ -41,9 +42,22 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   let content: React.ReactNode;
 
   if (loading) {
+    const skeletons = Array.from({ length: 6 }).map((_, i) => (
+      <SkeletonVideoCard
+        key={`skeleton-${i}-${title}`}
+        className={clsx(
+          "p-2",
+          i >= 1 && "sm:hidden",
+          i >= 2 && "md:hidden",
+          i >= 3 && "lg:hidden",
+          i >= 4 && "xl:hidden",
+        )}
+      />
+    ));
+
     content = (
-      <div className="flex justify-center p-4">
-        <ProgressSpinner />
+      <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+        {skeletons}
       </div>
     );
   } else if (videos.length > 0) {

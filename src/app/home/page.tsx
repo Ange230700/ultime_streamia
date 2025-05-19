@@ -7,7 +7,6 @@ import axios from "axios";
 import { CategoryContext } from "@/app/contexts/CategoryContext";
 import { Video } from "@/app/contexts/VideoContext";
 import CategorySection from "@/app/components/CategorySection";
-import { ProgressSpinner } from "primereact/progressspinner";
 import type { ApiResponse } from "@/types/api-response";
 import { unwrapApi } from "@/utils/unwrapApi";
 
@@ -22,48 +21,31 @@ export default function Home() {
     Record<number, boolean>
   >({});
 
-  // Fetch per-category videos
+  const loadCategoryVideos = async (catId: number) => {
+    setLoadingByCategory((prev) => ({ ...prev, [catId]: true }));
+    try {
+      const res = await axios.get<
+        ApiResponse<{ videos: Video[]; total: number }>
+      >(`/api/categories/${catId}/videos`, {
+        params: { offset: 0, limit: 10 },
+      });
+      const data = unwrapApi(res.data);
+      setVideosByCategory((prev) => ({
+        ...prev,
+        [catId]: data.videos,
+      }));
+    } catch (err) {
+      console.error(`Failed to load videos for category ${catId}`, err);
+    } finally {
+      setLoadingByCategory((prev) => ({ ...prev, [catId]: false }));
+    }
+  };
+
   useEffect(() => {
     categories.forEach((cat) => {
-      const catId = cat.category_id;
-      // Set this category as loading
-      setLoadingByCategory((prev) => ({ ...prev, [catId]: true }));
-
-      axios
-        .get<ApiResponse<{ videos: Video[]; total: number }>>(
-          `/api/categories/${catId}/videos`,
-          { params: { offset: 0, limit: 10 } },
-        )
-        .then((res) => {
-          const data = unwrapApi(res.data);
-          setVideosByCategory((prev) => ({
-            ...prev,
-            [catId]: data.videos,
-          }));
-        })
-
-        .catch((err) => {
-          console.error(`Failed to load videos for ${cat.category_name}`, err);
-        })
-        .finally(() => {
-          setLoadingByCategory((prev) => ({ ...prev, [catId]: false }));
-        });
+      loadCategoryVideos(cat.category_id);
     });
   }, [categories]);
-
-  // Determine if any category is still loading
-  const isAnyLoading = categories.some(
-    (cat) => loadingByCategory[cat.category_id],
-  );
-
-  // Show a global spinner while any category data is loading
-  if (isAnyLoading) {
-    return (
-      <div className="flex h-full flex-1 items-center justify-center py-8">
-        <ProgressSpinner />
-      </div>
-    );
-  }
 
   return (
     <div className="flex-1 space-y-12 p-4">

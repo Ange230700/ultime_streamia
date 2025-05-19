@@ -7,8 +7,8 @@ import React, { useState } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { Avatar } from "primereact/avatar";
-import { ProgressSpinner } from "primereact/progressspinner";
 import type { Video } from "@/app/contexts/VideoContext";
+import { Skeleton } from "primereact/skeleton";
 
 export interface VideoCardProps {
   readonly video: Video & {
@@ -61,12 +61,17 @@ export default function VideoCard({
     );
   } else {
     headerImageContent = (
-      <div className="relative aspect-video w-full">
+      <div className="relative aspect-video w-full overflow-hidden rounded-t-lg">
+        {!isLoaded && (
+          <div className="absolute inset-0 z-30">
+            <Skeleton width="100%" height="100%" className="h-full w-full" />
+          </div>
+        )}
         <Image
           alt={video.video_title}
           src={`data:image/jpeg;base64,${video.cover_image_data}`}
           fill
-          className="rounded-t-lg object-cover"
+          className={`rounded-t-lg object-cover transition-opacity duration-300 ${isLoaded ? "opacity-100" : "opacity-0"}`}
           onError={_handleError}
           onLoad={handleImageLoad}
           loading="lazy"
@@ -127,18 +132,18 @@ export default function VideoCard({
     >
       {hasImage && !isLoaded && (
         <div
-          className="absolute inset-0 z-30 flex items-center justify-center rounded-lg py-4"
+          className="absolute inset-0 z-30 overflow-hidden rounded-t-lg"
           style={{ backgroundColor: "var(--highlight-bg)" }}
         >
-          <ProgressSpinner />
+          <Skeleton width="100%" height="100%" className="h-full w-full" />
         </div>
       )}
       {loading ? (
         <div
-          className="absolute inset-0 z-30 flex items-center justify-center rounded-lg py-4"
+          className="absolute inset-0 z-30 overflow-hidden rounded-t-lg"
           style={{ backgroundColor: "var(--highlight-bg)" }}
         >
-          <ProgressSpinner />
+          <Skeleton width="100%" height="100%" className="h-full w-full" />
         </div>
       ) : (
         <p className="line-clamp-3 text-sm sm:text-base">
