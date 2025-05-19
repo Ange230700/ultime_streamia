@@ -1,35 +1,85 @@
 // prisma\schema.prisma
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
+generator client {
+  provider = "prisma-client-js"
+}
+
 model avatar {
   avatar_id  BigInt @id @default(autoincrement()) @db.UnsignedBigInt
   image_data Bytes? @db.Blob
-  user       user[]
+  users      user[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model user {
+  user_id   BigInt  @id @default(autoincrement()) @db.UnsignedBigInt
+  username  String  @db.VarChar(255)
+  email     String  @unique @db.VarChar(255) // email already unique
+  password  String  @db.VarChar(255)
+  is_admin  Boolean @default(false)
+  avatar_id BigInt  @db.UnsignedBigInt
+
+  comment        comment[]
+  favorite       favorite[]
+  watchlist      watchlist[]
+  refresh_tokens refresh_token[]
+
+  avatar avatar @relation(fields: [avatar_id], references: [avatar_id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model category {
-  category_id    BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
-  category_name  String           @db.VarChar(255)
-  category_video category_video[]
+  category_id   BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
+  category_name String           @unique @db.VarChar(255) // enforce no dup names
+  videos        category_video[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model video {
+  video_id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  video_title       String    @db.VarChar(255)
+  video_description String?   @db.Text
+  card_image_data   Bytes?    @db.Blob
+  cover_image_data  Bytes?    @db.Blob
+  video_data        Bytes?    @db.Blob
+  video_duration    DateTime? @db.Time(0)
+  release_date      DateTime  @default(now()) // default to now if omitted
+  is_available      Boolean   @default(true)
+
+  categories       category_video[]
+  comments         comment[]
+  favorites        favorite[]
+  watchlist_videos watchlist_video[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([video_title, release_date]) // ensure no two videos with same title/release
+  @@index([release_date])
 }
 
 model category_video {
-  category_video_id BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  category_id       BigInt?   @db.UnsignedBigInt
-  video_id          BigInt?   @db.UnsignedBigInt
-  category          category? @relation(fields: [category_id], references: [category_id], onDelete: Restrict, onUpdate: Restrict, map: "category_video_category_id_foreign")
-  video             video?    @relation(fields: [video_id], references: [video_id], onDelete: Restrict, onUpdate: Restrict, map: "category_video_video_id_foreign")
+  category_video_id BigInt @id @default(autoincrement()) @db.UnsignedBigInt
+  category_id       BigInt @db.UnsignedBigInt
+  video_id          BigInt @db.UnsignedBigInt
 
-  @@index([category_id], map: "category_video_category_id_foreign")
-  @@index([video_id], map: "category_video_video_id_foreign")
+  category category @relation(fields: [category_id], references: [category_id], onDelete: Cascade)
+  video    video    @relation(fields: [video_id], references: [video_id], onDelete: Cascade)
+
+  @@unique([category_id, video_id]) // prevent duplicate links
+  @@index([category_id])
+  @@index([video_id])
 }
 
 model comment {
@@ -37,76 +87,56 @@ model comment {
   user_id         BigInt   @db.UnsignedBigInt
   video_id        BigInt   @db.UnsignedBigInt
   comment_content String   @db.Text
-  written_at      DateTime @default(now()) @db.DateTime(0)
-  user            user     @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "comment_user_id_foreign")
-  video           video    @relation(fields: [video_id], references: [video_id], onUpdate: Restrict, map: "comment_video_id_foreign")
+  written_at      DateTime @default(now())
 
-  @@index([user_id], map: "comment_user_id_foreign")
-  @@index([video_id], map: "comment_video_id_foreign")
+  user  user  @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  video video @relation(fields: [video_id], references: [video_id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([user_id])
+  @@index([video_id])
 }
 
 model favorite {
   favorite_id BigInt @id @default(autoincrement()) @db.UnsignedBigInt
   user_id     BigInt @db.UnsignedBigInt
   video_id    BigInt @db.UnsignedBigInt
-  user        user   @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "favorite_user_id_foreign")
-  video       video  @relation(fields: [video_id], references: [video_id], onUpdate: Restrict, map: "favorite_video_id_foreign")
 
-  @@index([user_id], map: "favorite_user_id_foreign")
-  @@index([video_id], map: "favorite_video_id_foreign")
-}
+  user  user  @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  video video @relation(fields: [video_id], references: [video_id], onDelete: Cascade)
 
-model user {
-  user_id       BigInt          @id @default(autoincrement()) @db.UnsignedBigInt
-  username      String          @db.VarChar(255)
-  email         String          @unique(map: "user_email_unique") @db.VarChar(255)
-  password      String          @db.VarChar(255)
-  is_admin      Boolean         @default(false)
-  avatar_id     BigInt          @db.UnsignedBigInt
-  comment       comment[]
-  favorite      favorite[]
-  avatar        avatar          @relation(fields: [avatar_id], references: [avatar_id], onUpdate: Restrict, map: "user_avatar_id_foreign")
-  watchlist     watchlist[]
-  refresh_token refresh_token[]
+  created_at DateTime @default(now())
 
-  @@index([avatar_id], map: "user_avatar_id_foreign")
-}
-
-model video {
-  video_id          BigInt            @id @default(autoincrement()) @db.UnsignedBigInt
-  video_title       String            @db.VarChar(255)
-  video_description String?           @db.Text
-  card_image_data   Bytes?            @db.Blob
-  cover_image_data  Bytes?            @db.Blob
-  video_data        Bytes?            @db.Blob
-  video_duration    DateTime?         @db.Time(0)
-  release_date      DateTime          @db.DateTime(0)
-  is_available      Boolean           @default(true)
-  category_video    category_video[]
-  comment           comment[]
-  favorite          favorite[]
-  watchlist_video   watchlist_video[]
+  @@unique([user_id, video_id]) // prevent duplicate favorites
+  @@index([user_id])
+  @@index([video_id])
 }
 
 model watchlist {
-  watchlist_id    BigInt            @id @default(autoincrement()) @db.UnsignedBigInt
-  user_id         BigInt            @db.UnsignedBigInt
-  video_id        BigInt            @db.UnsignedBigInt
-  user            user              @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "watchlist_user_id_foreign")
-  watchlist_video watchlist_video[]
+  watchlist_id BigInt @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id      BigInt @db.UnsignedBigInt
+  video_id     BigInt @db.UnsignedBigInt
 
-  @@index([user_id], map: "watchlist_user_id_foreign")
+  user   user              @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  videos watchlist_video[]
+
+  @@unique([user_id, video_id]) // a user’s list only one per video
+  @@index([user_id])
 }
 
 model watchlist_video {
-  watchlist_video_id BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  watchlist_id       BigInt    @db.UnsignedBigInt
-  video_id           BigInt    @db.UnsignedBigInt
-  video              video     @relation(fields: [video_id], references: [video_id], onUpdate: Restrict, map: "watchlist_video_video_id_foreign")
-  watchlist          watchlist @relation(fields: [watchlist_id], references: [watchlist_id], onUpdate: Restrict, map: "watchlist_video_watchlist_id_foreign")
+  watchlist_video_id BigInt @id @default(autoincrement()) @db.UnsignedBigInt
+  watchlist_id       BigInt @db.UnsignedBigInt
+  video_id           BigInt @db.UnsignedBigInt
 
-  @@index([video_id], map: "watchlist_video_video_id_foreign")
-  @@index([watchlist_id], map: "watchlist_video_watchlist_id_foreign")
+  watchlist watchlist @relation(fields: [watchlist_id], references: [watchlist_id], onDelete: Cascade)
+  video     video     @relation(fields: [video_id], references: [video_id], onDelete: Cascade)
+
+  @@unique([watchlist_id, video_id]) // no duplicate entries
+  @@index([video_id])
+  @@index([watchlist_id])
 }
 
 model refresh_token {
@@ -114,7 +144,9 @@ model refresh_token {
   user_id    BigInt   @db.UnsignedBigInt
   issued_at  DateTime @default(now())
   expires_at DateTime
-  user       user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  user user @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 
   @@index([user_id])
+  @@index([expires_at]) // speed up expiry checks
 }
