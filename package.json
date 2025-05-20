@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "prepare": "husky",
-    "postinstall": "prisma generate",
+    "postinstall": "prisma generate && cp -R node_modules/primereact/resources/themes public/themes",
     "seed": "prisma db seed"
   },
   "dependencies": {
