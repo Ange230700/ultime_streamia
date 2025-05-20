@@ -4,6 +4,7 @@
 
 import React from "react";
 import { Carousel, CarouselResponsiveOption } from "primereact/carousel";
+import { Skeleton } from "primereact/skeleton";
 import { Video } from "@/app/contexts/VideoContext";
 import VideoCard from "@/app/components/VideoCard";
 import SkeletonVideoCard from "@/app/components/SkeletonVideoCard";
@@ -85,7 +86,9 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 
   return (
     <section className="space-y-2">
-      <h2 className="text-2xl font-semibold">{title}</h2>
+      <h2 className="text-2xl font-semibold">
+        {loading ? <Skeleton className="mb-2 h-6 w-1/4" /> : title}
+      </h2>
       {content}
     </section>
   );
