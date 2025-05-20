@@ -7,7 +7,6 @@ import { Carousel, CarouselResponsiveOption } from "primereact/carousel";
 import { Skeleton } from "primereact/skeleton";
 import { Video } from "@/app/contexts/VideoContext";
 import VideoCard from "@/app/components/VideoCard";
-import SkeletonVideoCard from "@/app/components/SkeletonVideoCard";
 
 export interface CategorySectionProps {
   title: string;
@@ -23,7 +22,7 @@ const responsiveOptions: CarouselResponsiveOption[] = [
 
 // lift this out so it's not re-created on every render of <Home>
 const videoItemTemplate = (video: Video) => (
-  <div className="h-full p-2">
+  <div className="flex justify-center">
     <VideoCard
       className="h-full"
       video={video}
@@ -37,9 +36,13 @@ const videoItemTemplate = (video: Video) => (
 
 const placeholders: number[] = Array.from({ length: 6 }, (_, i) => i);
 
-const skeletonItemTemplate = (index: number) => (
-  <div className="h-full p-2" key={`skeleton-${index}`}>
-    <SkeletonVideoCard className="h-full w-full" />
+const loadingItemTemplate = (index: number) => (
+  <div
+    key={`skeleton-${index}`}
+    className="flex h-[528px] w-[384px] justify-center"
+    style={{ backgroundColor: "var(--highlight-bg)" }}
+  >
+    <Skeleton width="100%" height="100%" shape="rectangle" />
   </div>
 );
 
@@ -59,7 +62,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
         numVisible={3}
         numScroll={1}
         responsiveOptions={responsiveOptions}
-        itemTemplate={skeletonItemTemplate}
+        itemTemplate={loadingItemTemplate}
         className="custom-carousel"
       />
     );
@@ -78,7 +81,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
     );
   } else {
     content = (
-      <p className="text-500 text-center text-2xl">
+      <p className="text-500 h-130 text-center text-4xl">
         No videos in this category.
       </p>
     );
@@ -86,9 +89,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 
   return (
     <section className="space-y-2">
-      <h2 className="text-2xl font-semibold">
-        {loading ? <Skeleton className="mb-2 h-6 w-1/4" /> : title}
-      </h2>
+      <h2 className="text-2xl font-semibold">{title}</h2>
       {content}
     </section>
   );
