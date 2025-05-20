@@ -7,7 +7,6 @@ import { Carousel, CarouselResponsiveOption } from "primereact/carousel";
 import { Video } from "@/app/contexts/VideoContext";
 import VideoCard from "@/app/components/VideoCard";
 import SkeletonVideoCard from "@/app/components/SkeletonVideoCard";
-import clsx from "clsx";
 
 export interface CategorySectionProps {
   title: string;
@@ -34,6 +33,12 @@ const videoItemTemplate = (video: Video) => (
   </div>
 );
 
+const skeletonItemTemplate = (index: number) => (
+  <div className="p-2" key={`skeleton-${index}`}>
+    <SkeletonVideoCard className="w-full" />
+  </div>
+);
+
 const CategorySection: React.FC<CategorySectionProps> = ({
   title,
   videos,
@@ -42,23 +47,19 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   let content: React.ReactNode;
 
   if (loading) {
-    const skeletons = Array.from({ length: 6 }).map((_, i) => (
-      <SkeletonVideoCard
-        key={`skeleton-${i}-${title}`}
-        className={clsx(
-          "p-2",
-          i >= 1 && "sm:hidden",
-          i >= 2 && "md:hidden",
-          i >= 3 && "lg:hidden",
-          i >= 4 && "xl:hidden",
-        )}
-      />
-    ));
-
+    // display a carousel of skeleton placeholders while loading
+    const placeholders = Array.from({ length: 6 });
     content = (
-      <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-        {skeletons}
-      </div>
+      <Carousel
+        value={placeholders}
+        circular
+        autoplayInterval={3000}
+        numVisible={3}
+        numScroll={1}
+        responsiveOptions={responsiveOptions}
+        itemTemplate={skeletonItemTemplate}
+        className="custom-carousel"
+      />
     );
   } else if (videos.length > 0) {
     content = (
