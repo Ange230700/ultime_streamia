@@ -22,8 +22,9 @@ const responsiveOptions: CarouselResponsiveOption[] = [
 
 // lift this out so it's not re-created on every render of <Home>
 const videoItemTemplate = (video: Video) => (
-  <div className="p-2">
+  <div className="h-full p-2">
     <VideoCard
+      className="h-full"
       video={video}
       loading={false}
       onPlay={() => console.log("Play", video.video_title)}
@@ -33,9 +34,11 @@ const videoItemTemplate = (video: Video) => (
   </div>
 );
 
+const placeholders: number[] = Array.from({ length: 6 }, (_, i) => i);
+
 const skeletonItemTemplate = (index: number) => (
-  <div className="p-2" key={`skeleton-${index}`}>
-    <SkeletonVideoCard className="w-full" />
+  <div className="h-full p-2" key={`skeleton-${index}`}>
+    <SkeletonVideoCard className="h-full w-full" />
   </div>
 );
 
@@ -47,8 +50,6 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   let content: React.ReactNode;
 
   if (loading) {
-    // display a carousel of skeleton placeholders while loading
-    const placeholders = Array.from({ length: 6 });
     content = (
       <Carousel
         value={placeholders}
