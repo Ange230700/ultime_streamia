@@ -2,11 +2,12 @@
 
 "use client";
 
-import React from "react";
+import React, { useContext } from "react";
 import { Carousel, CarouselResponsiveOption } from "primereact/carousel";
 import { Skeleton } from "primereact/skeleton";
 import { Video } from "@/app/contexts/VideoContext";
 import VideoCard from "@/app/components/VideoCard";
+import { ToastContext } from "@/app/ClientLayout";
 
 export interface CategorySectionProps {
   title: string;
@@ -20,37 +21,61 @@ const responsiveOptions: CarouselResponsiveOption[] = [
   { breakpoint: "767px", numVisible: 1, numScroll: 1 },
 ];
 
-// lift this out so it's not re-created on every render of <Home>
-const videoItemTemplate = (video: Video) => (
-  <div className="flex justify-center">
-    <VideoCard
-      className="h-full"
-      video={video}
-      loading={false}
-      onPlay={() => console.log("Play", video.video_title)}
-      onAddToWatchlist={() => console.log("Watchlist", video.video_title)}
-      onAddToFavorites={() => console.log("Favorites", video.video_title)}
-    />
-  </div>
-);
-
 const placeholders: number[] = Array.from({ length: 6 }, (_, i) => i);
-
-const loadingItemTemplate = (index: number) => (
-  <div
-    key={`skeleton-${index}`}
-    className="flex h-[528px] w-[384px] justify-center"
-    style={{ backgroundColor: "var(--highlight-bg)" }}
-  >
-    <Skeleton width="100%" height="100%" shape="rectangle" />
-  </div>
-);
 
 const CategorySection: React.FC<CategorySectionProps> = ({
   title,
   videos,
   loading,
 }) => {
+  // Move useContext into component
+  const showToast = useContext(ToastContext);
+
+  // Define template here to use showToast
+  const videoItemTemplate = (video: Video) => (
+    <div className="flex justify-center">
+      <VideoCard
+        className="h-full"
+        video={video}
+        loading={false}
+        onPlay={() =>
+          showToast({
+            severity: "info",
+            summary: "Playing",
+            detail: video.video_title,
+            life: 3000,
+          })
+        }
+        onAddToWatchlist={() =>
+          showToast({
+            severity: "success",
+            summary: "Watchlist",
+            detail: `${video.video_title} added`,
+            life: 3000,
+          })
+        }
+        onAddToFavorites={() =>
+          showToast({
+            severity: "success",
+            summary: "Favorites",
+            detail: `${video.video_title} added`,
+            life: 3000,
+          })
+        }
+      />
+    </div>
+  );
+
+  const loadingItemTemplate = (index: number) => (
+    <div
+      key={`skeleton-${index}`}
+      className="flex h-[528px] w-[384px] justify-center"
+      style={{ backgroundColor: "var(--highlight-bg)" }}
+    >
+      <Skeleton width="100%" height="100%" shape="rectangle" />
+    </div>
+  );
+
   let content: React.ReactNode;
 
   if (loading) {
@@ -58,7 +83,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       <Carousel
         value={placeholders}
         circular
-        autoplayInterval={3000}
+        autoplayInterval={6000}
         numVisible={3}
         numScroll={1}
         responsiveOptions={responsiveOptions}
@@ -71,7 +96,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       <Carousel
         value={videos}
         circular
-        autoplayInterval={3000}
+        autoplayInterval={6000}
         numVisible={3}
         numScroll={1}
         responsiveOptions={responsiveOptions}

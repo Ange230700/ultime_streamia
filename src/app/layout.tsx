@@ -2,27 +2,7 @@
 
 import React from "react";
 import type { Metadata } from "next";
-import { PrimeReactProvider } from "primereact/api";
-import { Geist, Geist_Mono } from "next/font/google";
-import "@/app/globals.css";
-import "primeicons/primeicons.css";
-import Navbar from "@/app/components/Navbar";
-import Footer from "@/app/components/Footer";
-import { VideoProvider } from "@/app/providers/VideoProvider";
-import { CategoryProvider } from "@/app/providers/CategoryProvider";
-import { UserProvider } from "@/app/providers/UserProvider";
-import { ThemeProvider } from "@/app/providers/ThemeProvider";
-import ThemeStyles from "@/app/components/ThemeStyles";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import ClientLayout from "./ClientLayout";
 
 export const metadata: Metadata = {
   title: "Streamia",
@@ -34,28 +14,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
-      >
-        <ThemeProvider>
-          <ThemeStyles />
-          <PrimeReactProvider>
-            <UserProvider>
-              <header>
-                <Navbar />
-              </header>
-              <main className="flex flex-1 flex-col">
-                <CategoryProvider>
-                  <VideoProvider>{children}</VideoProvider>
-                </CategoryProvider>
-              </main>
-              <Footer />
-            </UserProvider>
-          </PrimeReactProvider>
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+  // just render your client-side wrapper
+  return <ClientLayout>{children}</ClientLayout>;
 }
