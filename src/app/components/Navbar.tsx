@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Menubar } from "primereact/menubar";
@@ -23,6 +23,7 @@ export default function Navbar() {
   const { theme, toggle } = useTheme();
   const router = useRouter();
   const { user } = useContext(UserContext);
+  const [searchText, setSearchText] = useState("");
 
   if (pathname === "/") {
     return null;
@@ -83,6 +84,14 @@ export default function Navbar() {
   const end = (
     <div className="align-items-center flex gap-2">
       <InputText
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            router.push(`/search?query=${encodeURIComponent(searchText)}`);
+          }
+        }}
         placeholder="Search"
         type="text"
         className="w-8rem sm:w-auto"
