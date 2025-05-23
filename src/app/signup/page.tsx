@@ -32,6 +32,7 @@ export default function SignupPage() {
         <li>At least one lowercase</li>
         <li>At least one uppercase</li>
         <li>At least one numeric</li>
+        <li>At least one special character</li>
         <li>Minimum 8 characters</li>
       </ul>
     </>
@@ -39,7 +40,8 @@ export default function SignupPage() {
 
   // Validation logic
   const isPasswordValid = useMemo(() => {
-    const passwordRegex = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}/;
+    const passwordRegex =
+      /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}/;
     return passwordRegex.test(password);
   }, [password]);
   const isConfirmValid = useMemo(
@@ -172,6 +174,7 @@ export default function SignupPage() {
 
           <FloatLabel className="flex w-full flex-col gap-2">
             <Password
+              id="confirm"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               type="password"

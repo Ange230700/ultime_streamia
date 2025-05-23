@@ -8,6 +8,7 @@ import { Skeleton } from "primereact/skeleton";
 import { Video } from "@/app/contexts/VideoContext";
 import VideoCard from "@/app/components/VideoCard";
 import { ToastContext } from "@/app/ClientLayout";
+import { UserContext } from "@/app/contexts/UserContext";
 
 export interface CategorySectionProps {
   title: string;
@@ -29,6 +30,12 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 }) => {
   // Move useContext into component
   const showToast = useContext(ToastContext);
+  const { user } = useContext(UserContext);
+
+  // Only show available videos to visitors; logged-in users see all
+  const videosToDisplay = user
+    ? videos
+    : videos.filter((video) => video.is_available);
 
   // Define template here to use showToast
   const videoItemTemplate = (video: Video) => (
@@ -92,10 +99,10 @@ const CategorySection: React.FC<CategorySectionProps> = ({
         className="custom-carousel"
       />
     );
-  } else if (videos.length > 0) {
+  } else if (videosToDisplay.length > 0) {
     content = (
       <Carousel
-        value={videos}
+        value={videosToDisplay}
         circular
         autoplayInterval={7000}
         numVisible={2}
