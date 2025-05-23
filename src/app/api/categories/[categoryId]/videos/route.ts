@@ -4,6 +4,7 @@ import { NextRequest } from "next/server";
 import { success, error } from "@/utils/apiResponse";
 import { prisma } from "@/lib/prisma";
 import type { Video } from "@/app/contexts/VideoContext";
+import type { Prisma } from "@prisma/client";
 
 // fetches both total count and paged videos for a category
 async function getVideosByCategory(
@@ -12,13 +13,12 @@ async function getVideosByCategory(
   limit: number,
 ): Promise<{ videos: Video[]; total: number }> {
   // build the where clause for videos linked to this category
-  const where = {
-    category_video: {
+  const where: Prisma.videoWhereInput = {
+    categories: {
       some: { category_id: BigInt(categoryId) },
     },
   };
 
-  // run count + page query in parallel
   const [total, rawVideos] = await Promise.all([
     prisma.video.count({ where }),
     prisma.video.findMany({
@@ -27,7 +27,7 @@ async function getVideosByCategory(
       take: limit,
       orderBy: { release_date: "desc" },
       include: {
-        category_video: {
+        categories: {
           include: { category: true },
         },
       },
@@ -43,14 +43,10 @@ async function getVideosByCategory(
     cover_image_data: v.cover_image_data
       ? Buffer.from(v.cover_image_data).toString("base64")
       : undefined,
-    categories: v.category_video
-      .map((cv) => cv.category) // get the category or null
-      .filter((c): c is NonNullable<typeof c> => c != null) // drop the nulls
-      .map((c) => ({
-        // now c is non-null
-        category_id: Number(c.category_id),
-        category_name: c.category_name,
-      })),
+    categories: v.categories.map((cv) => ({
+      category_id: Number(cv.category.category_id),
+      category_name: cv.category.category_name,
+    })),
   }));
 
   return { videos, total };

@@ -5,7 +5,7 @@ import axios from "axios";
 import React, { useState, useEffect, useMemo } from "react";
 import type { ReactNode } from "react";
 import PropTypes from "prop-types";
-import { UserContext, User, UserContextType } from "../contexts/UserContext";
+import { UserContext, User, UserContextType } from "@/app/contexts/UserContext";
 import authAxios, { setAccessToken } from "@/lib/authAxios";
 import type { ApiResponse } from "@/types/api-response";
 

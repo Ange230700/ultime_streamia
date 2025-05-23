@@ -27,7 +27,13 @@ async function main() {
   const avatars = await Promise.all(
     Array.from({ length: 10 }).map(async () => {
       const bytes = await urlToBytes(faker.image.avatar());
-      return prisma.avatar.create({ data: { image_data: bytes } });
+      return prisma.avatar.create({
+        data: {
+          image_data: bytes,
+          created_at: faker.date.past({ years: 2 }),
+          updated_at: faker.date.recent({ days: 30 }),
+        },
+      });
     }),
   );
   console.log(`✔️  Created ${avatars.length} avatars`);
@@ -51,11 +57,16 @@ async function main() {
   );
   console.log(`✔️  Created ${users.length} users`);
 
-  // Create Categories
+  // 4. Create Categories (unique names)
+  const categoryNames = new Set<string>();
+  while (categoryNames.size < 5) {
+    categoryNames.add(faker.commerce.department());
+  }
+
   const categories = await Promise.all(
-    Array.from({ length: 5 }).map(() =>
+    Array.from(categoryNames).map((name) =>
       prisma.category.create({
-        data: { category_name: faker.commerce.department() },
+        data: { category_name: name },
       }),
     ),
   );
@@ -120,13 +131,23 @@ async function main() {
   console.log(`✔️  Created ${commentCreations.length} comments`);
 
   // 8. Create favorites
+  const favSet = new Set<string>();
+  const favData: { user_id: bigint; video_id: bigint }[] = [];
+
+  while (favData.length < 50) {
+    const u = faker.helpers.arrayElement(users).user_id;
+    const v = faker.helpers.arrayElement(videos).video_id;
+    const key = `${u.toString()}-${v.toString()}`;
+    if (!favSet.has(key)) {
+      favSet.add(key);
+      favData.push({ user_id: u, video_id: v });
+    }
+  }
+
   const favoriteCreations = await Promise.all(
-    Array.from({ length: 50 }).map(() =>
+    favData.map((data) =>
       prisma.favorite.create({
-        data: {
-          user_id: faker.helpers.arrayElement(users).user_id,
-          video_id: faker.helpers.arrayElement(videos).video_id,
-        },
+        data,
       }),
     ),
   );

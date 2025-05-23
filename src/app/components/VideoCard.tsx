@@ -69,7 +69,7 @@ export default function VideoCard({
         )}
         <Image
           alt={video.video_title}
-          src={`data:image/jpeg;base64,${video.cover_image_data}`}
+          src={`data:image/svg+xml;base64,${video.cover_image_data}`}
           fill
           className={`rounded-t-lg object-cover transition-opacity duration-300 ${isLoaded ? "opacity-100" : "opacity-0"}`}
           onError={_handleError}

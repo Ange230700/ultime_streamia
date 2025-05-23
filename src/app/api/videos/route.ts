@@ -21,7 +21,7 @@ export async function GET(request: Request) {
       is_available: true,
       cover_image_data: true,
 
-      category_video: {
+      categories: {
         select: {
           category: {
             select: {
@@ -45,9 +45,9 @@ export async function GET(request: Request) {
     cover_image_data: v.cover_image_data
       ? Buffer.from(v.cover_image_data).toString("base64")
       : null,
-    categories: v.category_video.map((cv) => ({
-      category_id: Number(cv.category?.category_id),
-      category_name: cv.category?.category_name,
+    categories: v.categories.map((cv) => ({
+      category_id: Number(cv.category.category_id),
+      category_name: cv.category.category_name,
     })),
   }));
 

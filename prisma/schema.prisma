@@ -15,7 +15,7 @@ model avatar {
   users      user[]
 
   created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  updated_at DateTime?
 }
 
 model user {
