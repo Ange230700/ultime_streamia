@@ -8,6 +8,7 @@ export interface User {
   username: string;
   email: string;
   is_admin: boolean;
+  avatarUrl?: string;
 }
 
 export interface UserContextType {

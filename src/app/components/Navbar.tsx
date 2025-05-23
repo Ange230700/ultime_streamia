@@ -2,14 +2,16 @@
 
 "use client";
 
-import React from "react";
+import React, { useContext } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Menubar } from "primereact/menubar";
 import { InputText } from "primereact/inputtext";
 import { MenuItem } from "primereact/menuitem";
 import { Button } from "primereact/button";
+import { Avatar } from "primereact/avatar";
 import { useTheme } from "@/app/hooks/useTheme";
+import { UserContext } from "@/app/contexts/UserContext";
 
 type NavbarMenuItem = MenuItem & {
   label?: string;
@@ -19,6 +21,8 @@ type NavbarMenuItem = MenuItem & {
 export default function Navbar() {
   const { theme, toggle } = useTheme();
   const router = useRouter();
+  const { user } = useContext(UserContext);
+
   const items: NavbarMenuItem[] = [
     {
       label: "Home",
@@ -27,11 +31,50 @@ export default function Navbar() {
     },
   ];
 
+  let authButton: React.ReactNode;
+  if (user) {
+    if (user.avatarUrl) {
+      authButton = (
+        <Avatar
+          image={user.avatarUrl}
+          shape="circle"
+          size="large"
+          style={{ cursor: "pointer" }}
+          onClick={() => router.push("/profile")}
+        />
+      );
+    } else {
+      authButton = (
+        <Avatar
+          label={user.username.charAt(0).toUpperCase()}
+          shape="circle"
+          size="large"
+          style={{
+            cursor: "pointer",
+            backgroundColor: "var(--primary-color)",
+            color: "var(--text-color)",
+          }}
+          onClick={() => router.push("/profile")}
+        />
+      );
+    }
+  } else {
+    authButton = (
+      <Button
+        icon="pi pi-user"
+        rounded
+        aria-label="Login"
+        onClick={() => router.push("/login")}
+      />
+    );
+  }
+
   const start = (
     <Link href="/" passHref>
       <p className="text-5xl font-bold hover:underline">Streamia</p>
     </Link>
   );
+
   const end = (
     <div className="align-items-center flex gap-2">
       <InputText
@@ -45,12 +88,7 @@ export default function Navbar() {
         aria-label="Toggle theme"
         onClick={toggle}
       />
-      <Button
-        icon="pi pi-user"
-        rounded
-        aria-label="Login"
-        onClick={() => router.push("/login")}
-      />
+      {authButton}
     </div>
   );
 
