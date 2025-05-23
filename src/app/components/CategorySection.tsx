@@ -33,7 +33,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 
   // Define template here to use showToast
   const videoItemTemplate = (video: Video) => (
-    <div className="flex justify-center">
+    <div className="flex justify-center p-4">
       <VideoCard
         className="h-full"
         video={video}
