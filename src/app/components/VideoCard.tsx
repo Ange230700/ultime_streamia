@@ -3,12 +3,13 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { Avatar } from "primereact/avatar";
 import type { Video } from "@/app/contexts/VideoContext";
 import { Skeleton } from "primereact/skeleton";
+import { UserContext } from "@/app/contexts/UserContext";
 
 export interface VideoCardProps {
   readonly video: Video & {
@@ -29,6 +30,7 @@ export default function VideoCard({
   className = "",
   loading = false,
 }: Readonly<VideoCardProps>) {
+  const { user } = useContext(UserContext);
   const [imgError, setImgError] = useState(false);
   const hasImage = Boolean(video.cover_image_data);
   const [isLoaded, setIsLoaded] = useState(!hasImage);
@@ -45,10 +47,10 @@ export default function VideoCard({
 
   // Subtitle or spinner
   let subTitleContent: React.ReactNode;
-  if (!video.is_available) {
+  if (!video.is_available && !user) {
     subTitleContent = "Unavailable";
   } else {
-    subTitleContent = "Available";
+    subTitleContent = video.is_available || user ? "Available" : "Unavailable";
   }
 
   // Header image or spinner/avatar
@@ -83,7 +85,7 @@ export default function VideoCard({
   const header = (
     <div className="relative aspect-video w-full overflow-hidden rounded-t-lg">
       {headerImageContent}
-      {!loading && !video.is_available && (
+      {!loading && !video.is_available && !user && (
         <div
           className="absolute inset-0 flex items-center justify-center opacity-90 backdrop-blur-3xl"
           style={{ backgroundColor: "var(--highlight-bg)" }}
