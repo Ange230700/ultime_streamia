@@ -106,6 +106,7 @@ export default function SignupPage() {
         <div className="mb-8 flex w-full flex-col gap-8">
           <FloatLabel className="flex w-full flex-col gap-2">
             <InputText
+              id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               type="text"
@@ -122,6 +123,7 @@ export default function SignupPage() {
 
           <FloatLabel className="flex w-full flex-col gap-2">
             <InputText
+              id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               type="email"
@@ -138,6 +140,7 @@ export default function SignupPage() {
 
           <FloatLabel className="flex w-full flex-col gap-2">
             <Password
+              id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               type="password"

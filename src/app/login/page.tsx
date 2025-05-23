@@ -5,7 +5,9 @@
 import React, { useState, useContext } from "react";
 import { useRouter } from "next/navigation";
 import { InputText } from "primereact/inputtext";
+import { Password } from "primereact/password";
 import { Button } from "primereact/button";
+import { FloatLabel } from "primereact/floatlabel";
 import { ToastContext } from "@/app/ClientLayout";
 import { UserContext } from "@/app/contexts/UserContext";
 
@@ -48,31 +50,46 @@ export default function LoginPage() {
       <form
         style={{ backgroundColor: "var(--surface-section)" }}
         onSubmit={handleSubmit}
-        className="bg-surface w-full max-w-sm rounded-lg p-6 shadow-md"
+        className="flex w-full max-w-sm flex-col items-center gap-2 rounded-lg p-6 shadow-md"
       >
-        <h2 className="mb-4 text-2xl font-semibold">Login to Streamia</h2>
+        <h2 className="mb-8 text-2xl font-semibold">Login to Streamia</h2>
 
-        <label className="mb-2 block font-medium">
-          Email
-          <InputText
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            type="email"
-            required
-            className="mb-4 w-full"
-          />
-        </label>
+        <div className="mb-8 flex w-full flex-col gap-8">
+          <FloatLabel className="flex w-full flex-col gap-2">
+            <InputText
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              required
+              className="w-full rounded-lg px-3 py-2 shadow-sm"
+            />
+            <label
+              htmlFor="email"
+              className="text-surface-900 dark:text-surface-0 leading-normal font-medium"
+            >
+              Email
+            </label>
+          </FloatLabel>
 
-        <label className="mb-2 block font-medium">
-          Password
-          <InputText
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            type="password"
-            required
-            className="mb-6 w-full"
-          />
-        </label>
+          <FloatLabel className="flex w-full flex-col gap-2">
+            <Password
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type="password"
+              required
+              toggleMask
+              feedback={false}
+            />
+            <label
+              htmlFor="password"
+              className="text-surface-900 dark:text-surface-0 leading-normal font-medium"
+            >
+              Password
+            </label>
+          </FloatLabel>
+        </div>
 
         <Button
           label={loading ? "Logging in..." : "Login"}
