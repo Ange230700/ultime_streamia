@@ -103,6 +103,18 @@ export default function SignupPage() {
       >
         <h2 className="mb-8 text-2xl font-semibold">Create an account</h2>
 
+        <p className="flex items-center justify-center text-center">
+          Already have an account?{" "}
+          <Button
+            label="Log in here"
+            link
+            onClick={(e) => {
+              e.preventDefault();
+              router.push("/login");
+            }}
+          />
+        </p>
+
         <div className="mb-8 flex w-full flex-col gap-8">
           <FloatLabel className="flex w-full flex-col gap-2">
             <InputText
@@ -183,18 +195,6 @@ export default function SignupPage() {
           className="p-button-raised w-full"
           disabled={loading}
         />
-
-        <p className="mt-4 flex items-center justify-center text-center">
-          Already have an account?{" "}
-          <Button
-            label="Log in here"
-            link
-            onClick={(e) => {
-              e.preventDefault();
-              router.push("/login");
-            }}
-          />
-        </p>
       </form>
     </div>
   );

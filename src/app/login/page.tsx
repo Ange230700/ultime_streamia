@@ -54,6 +54,18 @@ export default function LoginPage() {
       >
         <h2 className="mb-8 text-2xl font-semibold">Login to Streamia</h2>
 
+        <p className="flex items-center justify-center text-center">
+          Don&apos;t have an account?{" "}
+          <Button
+            label="Sign up here"
+            link
+            onClick={(e) => {
+              e.preventDefault();
+              router.push("/signup");
+            }}
+          />
+        </p>
+
         <div className="mb-8 flex w-full flex-col gap-8">
           <FloatLabel className="flex w-full flex-col gap-2">
             <InputText
@@ -97,18 +109,6 @@ export default function LoginPage() {
           className="p-button-raised w-full"
           disabled={loading}
         />
-
-        <p className="mt-4 flex items-center justify-center text-center">
-          Don&apos;t have an account?{" "}
-          <Button
-            label="Sign up here"
-            link
-            onClick={(e) => {
-              e.preventDefault();
-              router.push("/signup");
-            }}
-          />
-        </p>
       </form>
     </div>
   );
