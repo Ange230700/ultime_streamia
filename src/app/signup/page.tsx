@@ -5,6 +5,7 @@
 import React, { useState, useContext } from "react";
 import { useRouter } from "next/navigation";
 import { InputText } from "primereact/inputtext";
+import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { ToastContext } from "@/app/ClientLayout";
 import authAxios from "@/lib/authAxios";
@@ -89,9 +90,10 @@ export default function SignupPage() {
 
         <label className="mb-2 block font-medium">
           Password
-          <InputText
+          <Password
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            toggleMask
             type="password"
             required
             className="mb-4 w-full"
@@ -100,9 +102,10 @@ export default function SignupPage() {
 
         <label className="mb-6 block font-medium">
           Confirm Password
-          <InputText
+          <Password
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
+            toggleMask
             type="password"
             required
             className="mb-4 w-full"
