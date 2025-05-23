@@ -3,10 +3,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "primereact/button";
 import Image from "next/image";
 
 export default function Home() {
+  const router = useRouter();
   const [isMd, setIsMd] = useState(false);
 
   useEffect(() => {
@@ -40,11 +42,7 @@ export default function Home() {
                 label="Check it out"
                 type="button"
                 className="p-button-raised mr-3"
-              />
-              <Button
-                label="Learn more"
-                type="button"
-                className="p-button-outlined"
+                onClick={() => router.push("/home")}
               />
             </div>
           </section>
@@ -71,6 +69,7 @@ export default function Home() {
           label="Join Now"
           icon="pi pi-check-circle"
           className="p-button-raised p-button-rounded white-space-nowrap px-5 py-3 font-bold"
+          onClick={() => router.push("/signup")}
         />
       </div>
     </div>

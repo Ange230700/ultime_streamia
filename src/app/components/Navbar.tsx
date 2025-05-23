@@ -4,7 +4,7 @@
 
 import React, { useContext } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Menubar } from "primereact/menubar";
 import { InputText } from "primereact/inputtext";
 import { MenuItem } from "primereact/menuitem";
@@ -19,9 +19,14 @@ type NavbarMenuItem = MenuItem & {
 };
 
 export default function Navbar() {
+  const pathname = usePathname();
   const { theme, toggle } = useTheme();
   const router = useRouter();
   const { user } = useContext(UserContext);
+
+  if (pathname === "/") {
+    return null;
+  }
 
   const items: NavbarMenuItem[] = [
     {
