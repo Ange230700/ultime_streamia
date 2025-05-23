@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import { Button } from "primereact/button";
+import { FloatLabel } from "primereact/floatlabel";
 import { ToastContext } from "@/app/ClientLayout";
 import authAxios from "@/lib/authAxios";
 
@@ -63,59 +64,56 @@ export default function SignupPage() {
       <form
         style={{ backgroundColor: "var(--surface-section)" }}
         onSubmit={handleSubmit}
-        className="bg-surface w-full max-w-sm rounded-lg p-6 shadow-md"
+        className="flex w-full max-w-sm flex-col items-center gap-8 rounded-lg p-6 shadow-md"
       >
-        <h2 className="mb-4 text-2xl font-semibold">Create an account</h2>
+        <h2 className="mb-8 text-2xl font-semibold">Create an account</h2>
 
-        <label className="mb-2 block font-medium">
-          Username
+        <FloatLabel>
           <InputText
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            type="text"
             required
-            className="mb-4 w-full"
           />
-        </label>
+          <label htmlFor="username">Username</label>
+        </FloatLabel>
 
-        <label className="mb-2 block font-medium">
-          Email
+        <FloatLabel>
           <InputText
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             type="email"
             required
-            className="mb-4 w-full"
           />
-        </label>
+          <label htmlFor="email">Email</label>
+        </FloatLabel>
 
-        <label className="mb-2 block font-medium">
-          Password
+        <FloatLabel>
           <Password
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            toggleMask
             type="password"
             required
-            className="mb-4 w-full"
+            toggleMask
           />
-        </label>
+          <label htmlFor="password">Password</label>
+        </FloatLabel>
 
-        <label className="mb-6 block font-medium">
-          Confirm Password
+        <FloatLabel>
           <Password
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            toggleMask
             type="password"
             required
-            className="mb-4 w-full"
+            toggleMask
           />
-        </label>
+          <label htmlFor="password">Confirm Password</label>
+        </FloatLabel>
 
         <Button
           label={loading ? "Signing up..." : "Sign Up"}
           type="submit"
-          className="p-button-raised w-full"
+          className="p-button-raised"
           disabled={loading}
         />
 
