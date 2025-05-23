@@ -22,7 +22,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const { theme, toggle } = useTheme();
   const router = useRouter();
-  const { user } = useContext(UserContext);
+  const { user, logout } = useContext(UserContext);
   const [searchText, setSearchText] = useState("");
 
   // Debounce and navigate on searchText change
@@ -46,20 +46,36 @@ export default function Navbar() {
     },
   ];
 
-  let authButton: React.ReactNode;
+  let authControls: React.ReactNode;
   if (user) {
     if (user.avatarUrl) {
-      authButton = (
-        <Avatar
-          image={user.avatarUrl}
-          shape="circle"
-          size="large"
-          style={{ cursor: "pointer" }}
-          onClick={() => router.push("/profile")}
-        />
+      authControls = (
+        <div className="flex items-center gap-2">
+          <Avatar
+            image={user.avatarUrl}
+            label={
+              !user.avatarUrl
+                ? user.username.charAt(0).toUpperCase()
+                : undefined
+            }
+            shape="circle"
+            size="large"
+            style={{ cursor: "pointer" }}
+            onClick={() => router.push("/profile")}
+          />
+          <Button
+            icon="pi pi-sign-out"
+            rounded
+            aria-label="Logout"
+            onClick={async () => {
+              await logout();
+              router.push("/login");
+            }}
+          />
+        </div>
       );
     } else {
-      authButton = (
+      authControls = (
         <Avatar
           label={user.username.charAt(0).toUpperCase()}
           shape="circle"
@@ -74,7 +90,7 @@ export default function Navbar() {
       );
     }
   } else {
-    authButton = (
+    authControls = (
       <Button
         icon="pi pi-user"
         rounded
@@ -105,7 +121,7 @@ export default function Navbar() {
         aria-label="Toggle theme"
         onClick={toggle}
       />
-      {authButton}
+      {authControls}
     </div>
   );
 
