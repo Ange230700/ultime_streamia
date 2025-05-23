@@ -6,6 +6,7 @@ import React, { useState, useContext } from "react";
 import { useRouter } from "next/navigation";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
+import { Divider } from "primereact/divider";
 import { Button } from "primereact/button";
 import { FloatLabel } from "primereact/floatlabel";
 import { ToastContext } from "@/app/ClientLayout";
@@ -20,6 +21,21 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Password field templates
+  const pwHeader = <div className="mb-3 font-bold">Pick a password</div>;
+  const pwFooter = (
+    <>
+      <Divider />
+      <p className="mt-2">Suggestions</p>
+      <ul className="line-height-3 mt-0 ml-2 pl-2">
+        <li>At least one lowercase</li>
+        <li>At least one uppercase</li>
+        <li>At least one numeric</li>
+        <li>Minimum 8 characters</li>
+      </ul>
+    </>
+  );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -95,6 +111,8 @@ export default function SignupPage() {
             type="password"
             required
             toggleMask
+            header={pwHeader}
+            footer={pwFooter}
           />
           <label htmlFor="password">Password</label>
         </FloatLabel>
@@ -106,6 +124,7 @@ export default function SignupPage() {
             type="password"
             required
             toggleMask
+            feedback={false}
           />
           <label htmlFor="password">Confirm Password</label>
         </FloatLabel>
