@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Menubar } from "primereact/menubar";
@@ -24,6 +24,15 @@ export default function Navbar() {
   const router = useRouter();
   const { user } = useContext(UserContext);
   const [searchText, setSearchText] = useState("");
+
+  // Debounce and navigate on searchText change
+  useEffect(() => {
+    if (searchText.trim() === "") return;
+    const timeout = setTimeout(() => {
+      router.push(`/search?query=${encodeURIComponent(searchText)}`);
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [searchText, router]);
 
   if (pathname === "/") {
     return null;
@@ -86,12 +95,6 @@ export default function Navbar() {
       <InputText
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            router.push(`/search?query=${encodeURIComponent(searchText)}`);
-          }
-        }}
         placeholder="Search"
         type="text"
         className="w-8rem sm:w-auto"
