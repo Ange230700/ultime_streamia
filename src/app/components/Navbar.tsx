@@ -45,7 +45,12 @@ export default function Navbar() {
         aria-label="Toggle theme"
         onClick={toggle}
       />
-      <Button icon="pi pi-user" rounded aria-label="User" />
+      <Button
+        icon="pi pi-user"
+        rounded
+        aria-label="Login"
+        onClick={() => router.push("/login")}
+      />
     </div>
   );
 

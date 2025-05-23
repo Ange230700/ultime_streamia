@@ -117,6 +117,11 @@ export default function VideoCard({
             aria-label="Add to Watchlist"
             onClick={() => onAddToWatchlist?.(video)}
           />
+          <Button
+            icon="pi pi-list"
+            className="p-button-rounded p-button-outlined"
+            aria-label="video details"
+          />
         </>
       }
     </div>
