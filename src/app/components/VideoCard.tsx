@@ -128,33 +128,37 @@ export default function VideoCard({
   );
 
   return (
-    <Card
-      title={title}
-      subTitle={subTitleContent}
-      header={header}
-      footer={footer}
-      className={`${className} relative w-full md:max-w-sm`}
-    >
-      {hasImage && !isLoaded && (
-        <div
-          className="absolute inset-0 z-30 overflow-hidden rounded-t-lg"
-          style={{ backgroundColor: "var(--highlight-bg)" }}
+    <div className={`flex justify-center p-2 ${className}`}>
+      <div className="relative h-auto w-full sm:h-[528px] sm:w-[384px]">
+        <Card
+          title={title}
+          subTitle={subTitleContent}
+          header={header}
+          footer={footer}
+          className="h-full w-full"
         >
-          <Skeleton width="100%" height="100%" className="h-full w-full" />
-        </div>
-      )}
-      {loading ? (
-        <div
-          className="absolute inset-0 z-30 overflow-hidden rounded-t-lg"
-          style={{ backgroundColor: "var(--highlight-bg)" }}
-        >
-          <Skeleton width="100%" height="100%" className="h-full w-full" />
-        </div>
-      ) : (
-        <p className="line-clamp-3 text-sm sm:text-base">
-          {video.video_description}
-        </p>
-      )}
-    </Card>
+          {hasImage && !isLoaded && (
+            <div
+              className="absolute inset-0 z-30 overflow-hidden rounded-t-lg"
+              style={{ backgroundColor: "var(--highlight-bg)" }}
+            >
+              <Skeleton width="100%" height="100%" shape="rectangle" />
+            </div>
+          )}
+          {loading ? (
+            <div
+              className="absolute inset-0 z-30 overflow-hidden rounded-t-lg"
+              style={{ backgroundColor: "var(--highlight-bg)" }}
+            >
+              <Skeleton width="100%" height="100%" shape="rectangle" />
+            </div>
+          ) : (
+            <p className="line-clamp-3 text-sm sm:text-base">
+              {video.video_description}
+            </p>
+          )}
+        </Card>
+      </div>
+    </div>
   );
 }

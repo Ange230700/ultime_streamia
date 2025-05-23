@@ -51,7 +51,13 @@ export default function SearchResult() {
     return (
       <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 md:grid-cols-3">
         {skeletonKeys.map((key) => (
-          <Skeleton key={key} width="100%" height="300px" />
+          <div
+            key={key}
+            className="flex h-auto w-full justify-center sm:h-[528px] sm:w-[384px]"
+            style={{ backgroundColor: "var(--highlight-bg)" }}
+          >
+            <Skeleton width="100%" height="100%" shape="rectangle" />
+          </div>
         ))}
       </div>
     );
@@ -67,7 +73,7 @@ export default function SearchResult() {
         Search Results for “{query}”
       </h1>
       {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((video) => (
             <VideoCard
               key={video.video_id}

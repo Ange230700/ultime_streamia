@@ -16,7 +16,6 @@ export interface CategorySectionProps {
 }
 
 const responsiveOptions: CarouselResponsiveOption[] = [
-  { breakpoint: "1400px", numVisible: 3, numScroll: 1 },
   { breakpoint: "1199px", numVisible: 2, numScroll: 1 },
   { breakpoint: "767px", numVisible: 1, numScroll: 1 },
 ];
@@ -33,7 +32,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 
   // Define template here to use showToast
   const videoItemTemplate = (video: Video) => (
-    <div className="flex justify-center p-4">
+    <div className="flex justify-center p-2">
       <VideoCard
         className="h-full"
         video={video}
@@ -67,12 +66,14 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   );
 
   const loadingItemTemplate = (index: number) => (
-    <div
-      key={`skeleton-${index}`}
-      className="flex h-[528px] w-[384px] justify-center"
-      style={{ backgroundColor: "var(--highlight-bg)" }}
-    >
-      <Skeleton width="100%" height="100%" shape="rectangle" />
+    <div className="flex justify-center p-2">
+      <div
+        key={`skeleton-${index}`}
+        className="flex h-auto w-full justify-center sm:h-[528px] sm:w-[384px]"
+        style={{ backgroundColor: "var(--highlight-bg)" }}
+      >
+        <Skeleton width="100%" height="100%" shape="rectangle" />
+      </div>
     </div>
   );
 
@@ -83,8 +84,8 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       <Carousel
         value={placeholders}
         circular
-        autoplayInterval={6000}
-        numVisible={3}
+        autoplayInterval={7000}
+        numVisible={2}
         numScroll={1}
         responsiveOptions={responsiveOptions}
         itemTemplate={loadingItemTemplate}
@@ -96,8 +97,8 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       <Carousel
         value={videos}
         circular
-        autoplayInterval={6000}
-        numVisible={3}
+        autoplayInterval={7000}
+        numVisible={2}
         numScroll={1}
         responsiveOptions={responsiveOptions}
         itemTemplate={videoItemTemplate}
