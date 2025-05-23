@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
@@ -37,11 +37,30 @@ export default function SignupPage() {
     </>
   );
 
+  // Validation logic
+  const isPasswordValid = useMemo(() => {
+    const passwordRegex = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}/;
+    return passwordRegex.test(password);
+  }, [password]);
+  const isConfirmValid = useMemo(
+    () => confirm.length > 0 && password === confirm,
+    [password, confirm],
+  );
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (password !== confirm) {
+    if (!isPasswordValid) {
       showToast({
-        severity: "warn",
+        severity: "error",
+        summary: "Invalid Password",
+        detail: "Password does not meet criteria",
+        life: 3000,
+      });
+      return;
+    }
+    if (!isConfirmValid) {
+      showToast({
+        severity: "error",
         summary: "Mismatch",
         detail: "Passwords do not match",
         life: 3000,
@@ -113,6 +132,7 @@ export default function SignupPage() {
             toggleMask
             header={pwHeader}
             footer={pwFooter}
+            invalid={!isPasswordValid && password.length > 0}
           />
           <label htmlFor="password">Password</label>
         </FloatLabel>
@@ -125,6 +145,7 @@ export default function SignupPage() {
             required
             toggleMask
             feedback={false}
+            invalid={!isConfirmValid && confirm.length > 0}
           />
           <label htmlFor="password">Confirm Password</label>
         </FloatLabel>
