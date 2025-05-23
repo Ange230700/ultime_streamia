@@ -1,3 +1,11 @@
 /* src\app\globals.css */
 
 @import "tailwindcss";
+
+form div[data-pc-name="password"] {
+  @apply w-full;
+}
+
+form div[data-pc-name="password"] > div {
+  @apply flex flex-1 flex-col;
+}

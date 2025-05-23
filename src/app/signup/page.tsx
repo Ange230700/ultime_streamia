@@ -99,61 +99,85 @@ export default function SignupPage() {
       <form
         style={{ backgroundColor: "var(--surface-section)" }}
         onSubmit={handleSubmit}
-        className="flex w-full max-w-sm flex-col items-center gap-8 rounded-lg p-6 shadow-md"
+        className="flex w-full max-w-sm flex-col items-center gap-2 rounded-lg p-6 shadow-md"
       >
         <h2 className="mb-8 text-2xl font-semibold">Create an account</h2>
 
-        <FloatLabel>
-          <InputText
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            type="text"
-            required
-          />
-          <label htmlFor="username">Username</label>
-        </FloatLabel>
+        <div className="mb-8 flex w-full flex-col gap-8">
+          <FloatLabel className="flex w-full flex-col gap-2">
+            <InputText
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              type="text"
+              required
+              className="w-full rounded-lg px-3 py-2 shadow-sm"
+            />
+            <label
+              htmlFor="username"
+              className="text-surface-900 dark:text-surface-0 leading-normal font-medium"
+            >
+              Username
+            </label>
+          </FloatLabel>
 
-        <FloatLabel>
-          <InputText
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            type="email"
-            required
-          />
-          <label htmlFor="email">Email</label>
-        </FloatLabel>
+          <FloatLabel className="flex w-full flex-col gap-2">
+            <InputText
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              required
+              className="w-full rounded-lg px-3 py-2 shadow-sm"
+            />
+            <label
+              htmlFor="email"
+              className="text-surface-900 dark:text-surface-0 leading-normal font-medium"
+            >
+              Email
+            </label>
+          </FloatLabel>
 
-        <FloatLabel>
-          <Password
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            type="password"
-            required
-            toggleMask
-            header={pwHeader}
-            footer={pwFooter}
-            invalid={!isPasswordValid && password.length > 0}
-          />
-          <label htmlFor="password">Password</label>
-        </FloatLabel>
+          <FloatLabel className="flex w-full flex-col gap-2">
+            <Password
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type="password"
+              required
+              toggleMask
+              header={pwHeader}
+              footer={pwFooter}
+              invalid={!isPasswordValid && password.length > 0}
+            />
+            <label
+              htmlFor="password"
+              className="text-surface-900 dark:text-surface-0 leading-normal font-medium"
+            >
+              Password
+            </label>
+          </FloatLabel>
 
-        <FloatLabel>
-          <Password
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            type="password"
-            required
-            toggleMask
-            feedback={false}
-            invalid={!isConfirmValid && confirm.length > 0}
-          />
-          <label htmlFor="password">Confirm Password</label>
-        </FloatLabel>
+          <FloatLabel className="flex w-full flex-col gap-2">
+            <Password
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              type="password"
+              required
+              toggleMask
+              feedback={false}
+              invalid={!isConfirmValid && confirm.length > 0}
+            />
+            <label
+              htmlFor="password"
+              className="text-surface-900 dark:text-surface-0 leading-normal font-medium"
+            >
+              Confirm Password
+            </label>
+          </FloatLabel>
+        </div>
 
         <Button
           label={loading ? "Signing up..." : "Sign Up"}
           type="submit"
-          className="p-button-raised"
+          className="p-button-raised w-full"
           disabled={loading}
         />
 
