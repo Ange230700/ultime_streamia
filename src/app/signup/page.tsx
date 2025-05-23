@@ -1,4 +1,4 @@
-// src/app/login/page.tsx
+/* src/app/signup/page.tsx */
 
 "use client";
 
@@ -7,34 +7,48 @@ import { useRouter } from "next/navigation";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { ToastContext } from "@/app/ClientLayout";
-import { UserContext } from "@/app/contexts/UserContext";
+import authAxios from "@/lib/authAxios";
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
   const showToast = useContext(ToastContext);
-  const { login } = useContext(UserContext);
 
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    try {
-      await login(email, password);
+    if (password !== confirm) {
       showToast({
-        severity: "success",
-        summary: "Logged in",
-        detail: "Welcome back!",
+        severity: "warn",
+        summary: "Mismatch",
+        detail: "Passwords do not match",
         life: 3000,
       });
-      router.push("/home");
+      return;
+    }
+    setLoading(true);
+    try {
+      await authAxios.post(
+        "/api/users/register",
+        { username, email, password },
+        { withCredentials: true },
+      );
+      showToast({
+        severity: "success",
+        summary: "Account created",
+        detail: "Please log in.",
+        life: 3000,
+      });
+      router.push("/login");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       showToast({
         severity: "error",
-        summary: "Login failed",
+        summary: "Signup failed",
         detail: message,
         life: 3000,
       });
@@ -50,7 +64,17 @@ export default function LoginPage() {
         onSubmit={handleSubmit}
         className="bg-surface w-full max-w-sm rounded-lg p-6 shadow-md"
       >
-        <h2 className="mb-4 text-2xl font-semibold">Login to Streamia</h2>
+        <h2 className="mb-4 text-2xl font-semibold">Create an account</h2>
+
+        <label className="mb-2 block font-medium">
+          Username
+          <InputText
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            className="mb-4 w-full"
+          />
+        </label>
 
         <label className="mb-2 block font-medium">
           Email
@@ -70,25 +94,36 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             type="password"
             required
-            className="mb-6 w-full"
+            className="mb-4 w-full"
+          />
+        </label>
+
+        <label className="mb-6 block font-medium">
+          Confirm Password
+          <InputText
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            type="password"
+            required
+            className="mb-4 w-full"
           />
         </label>
 
         <Button
-          label={loading ? "Logging in..." : "Login"}
+          label={loading ? "Signing up..." : "Sign Up"}
           type="submit"
           className="p-button-raised w-full"
           disabled={loading}
         />
 
         <p className="mt-4 flex items-center justify-center text-center">
-          Don&apos;t have an account?{" "}
+          Already have an account?{" "}
           <Button
-            label="Sign up here"
+            label="Log in here"
             link
             onClick={(e) => {
               e.preventDefault();
-              router.push("/signup");
+              router.push("/login");
             }}
           />
         </p>
