@@ -3,7 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import React, { Suspense } from "react";
-import SearchResultClient from "./SearchResultClient";
+import SearchResultClient from "@/app/search/SearchResultClient";
 
 export default async function Page({
   searchParams,
