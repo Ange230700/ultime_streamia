@@ -51,12 +51,9 @@ async function getVideosByCategory(
   return { videos, total };
 }
 
-export async function GET(
-  req: Request,
-  { params }: { params: { categoryId: string } },
-) {
+export async function GET(request: Request, { params }) {
   try {
-    const url = new URL(req.url);
+    const url = new URL(request.url);
     const offset = parseInt(url.searchParams.get("offset") ?? "0", 10);
     const limit = parseInt(url.searchParams.get("limit") ?? "10", 10);
     const categoryId = parseInt(params.categoryId, 10);
@@ -66,6 +63,7 @@ export async function GET(
       offset,
       limit,
     );
+
     return success({ videos, total }, 200);
   } catch (err) {
     console.error(err);
