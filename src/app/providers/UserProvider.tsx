@@ -68,7 +68,7 @@ export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
     refreshAbortController = null;
     document.cookie = "refresh_token=; Max-Age=0; path=/;";
     try {
-      await http.post("/api/users/logout", null, { withCredentials: true });
+      await http.post("/api/users/logout");
     } catch {}
   };
 
