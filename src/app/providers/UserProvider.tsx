@@ -1,7 +1,7 @@
 // src\app\providers\UserProvider.tsx
 
 "use client";
-import axios from "axios";
+import http from "@/lib/http";
 import React, { useState, useEffect, useMemo } from "react";
 import type { ReactNode } from "react";
 import PropTypes from "prop-types";
@@ -17,7 +17,7 @@ export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
 
   useEffect(() => {
     refreshToken(); // Try refreshing on load
-  });
+  }, []);
 
   const refreshToken = async () => {
     refreshAbortController?.abort(); // Abort any existing request
@@ -68,7 +68,7 @@ export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
     refreshAbortController = null;
     document.cookie = "refresh_token=; Max-Age=0; path=/;";
     try {
-      await axios.post("/api/users/logout", null, { withCredentials: true });
+      await http.post("/api/users/logout", null, { withCredentials: true });
     } catch {}
   };
 

@@ -3,7 +3,7 @@
 "use client";
 
 import React, { useState, useEffect, useContext } from "react";
-import axios from "axios";
+import http from "@/lib/http";
 import { CategoryContext } from "@/app/contexts/CategoryContext";
 import { Video } from "@/app/contexts/VideoContext";
 import CategorySection from "@/app/components/CategorySection";
@@ -24,7 +24,7 @@ export default function Home() {
   const loadCategoryVideos = async (catId: number) => {
     setLoadingByCategory((prev) => ({ ...prev, [catId]: true }));
     try {
-      const res = await axios.get<
+      const res = await http.get<
         ApiResponse<{ videos: Video[]; total: number }>
       >(`/api/categories/${catId}/videos`, {
         params: { offset: 0, limit: 10 },

@@ -1,7 +1,7 @@
 // src\app\providers\CategoryProvider.tsx
 
 "use client";
-import axios from "axios";
+import http from "@/lib/http";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
 import PropTypes from "prop-types";
@@ -18,7 +18,7 @@ export function CategoryProvider({
   const [categories, setCategories] = useState<Category[]>([]);
 
   const refreshCategories = useCallback(async () => {
-    const res = await axios.get<ApiResponse<Category[]>>("/api/categories");
+    const res = await http.get<ApiResponse<Category[]>>("/api/categories");
 
     if (res.data.success) {
       setCategories(res.data.data);

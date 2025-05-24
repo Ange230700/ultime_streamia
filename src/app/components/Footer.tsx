@@ -1,4 +1,4 @@
-// src\app\components\Footer.jsx
+// src\app\components\Footer.tsx
 
 "use client";
 

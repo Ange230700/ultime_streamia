@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import axios from "axios";
+import http from "@/lib/http";
 import { unwrapApi } from "@/utils/unwrapApi";
 import type { ApiResponse } from "@/types/api-response";
 import { Video } from "@/app/contexts/VideoContext";
@@ -28,7 +28,7 @@ export default function SearchResult() {
     const fetchVideos = async () => {
       setLoading(true);
       try {
-        const res = await axios.get<
+        const res = await http.get<
           ApiResponse<{ videos: Video[]; total: number }>
         >("/api/videos", { params: { offset: 0, limit: 100 } });
         const data = unwrapApi(res.data);

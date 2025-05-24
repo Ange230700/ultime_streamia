@@ -1,4 +1,4 @@
-// src/prisma/utils/seedUtils.ts
+// src\utils\seedUtils.ts
 
 import fetch from "node-fetch";
 
