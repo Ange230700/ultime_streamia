@@ -1,5 +1,6 @@
 // prisma\seed.ts
 
+import { Prisma } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { faker } from "@faker-js/faker";
 import { prisma } from "@/lib/prisma";
@@ -7,21 +8,51 @@ import { urlToBytes, dataUriToBytes } from "@/utils/seedUtils";
 
 const SALT_ROUNDS = 10;
 
+async function safeDelete(fn: () => Promise<unknown>, name: string) {
+  const MAX = 5;
+  let tries = 0;
+  while (true) {
+    try {
+      await fn();
+      console.log(`✔️ Cleared ${name}`);
+      return;
+    } catch (error: unknown) {
+      // first narrow to PrismaClientKnownRequestError
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2034" &&
+        tries < MAX
+      ) {
+        tries++;
+        console.warn(`⏳ Deadlock on ${name}, retrying (${tries}/${MAX})…`);
+        continue;
+      }
+      // if it wasn’t the specific error (or maxed out), rethrow
+      throw error;
+    }
+  }
+}
+
+async function cleanup() {
+  await safeDelete(
+    () => prisma.watchlist_video.deleteMany(),
+    "watchlist_video",
+  );
+  await safeDelete(() => prisma.watchlist.deleteMany(), "watchlist");
+  await safeDelete(() => prisma.favorite.deleteMany(), "favorite");
+  await safeDelete(() => prisma.comment.deleteMany(), "comment");
+  await safeDelete(() => prisma.category_video.deleteMany(), "category_video");
+  await safeDelete(() => prisma.video.deleteMany(), "video");
+  await safeDelete(() => prisma.category.deleteMany(), "category");
+  await safeDelete(() => prisma.user.deleteMany(), "user");
+  await safeDelete(() => prisma.avatar.deleteMany(), "avatar");
+}
+
 async function main() {
   console.log("🌱 Start seeding...");
 
   // 1. Clean up in the right order
-  await Promise.all([
-    prisma.watchlist_video.deleteMany(),
-    prisma.watchlist.deleteMany(),
-    prisma.favorite.deleteMany(),
-    prisma.comment.deleteMany(),
-    prisma.category_video.deleteMany(),
-    prisma.video.deleteMany(),
-    prisma.category.deleteMany(),
-    prisma.user.deleteMany(),
-    prisma.avatar.deleteMany(),
-  ]);
+  await cleanup();
 
   // 2. Create some avatars
   const avatars = await Promise.all(
