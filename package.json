@@ -4,17 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "npm run prisma:generate && npm run prisma:migrate:deploy && npm run prisma:db:seed && next build",
     "start": "next start",
     "lint": "next lint",
     "prepare": "husky",
-    "postinstall": "prisma generate && rm -rf public/themes && cp -R node_modules/primereact/resources/themes public/themes",
-    "seed": "prisma db seed",
-    "migrate:dev": "prisma migrate dev --name init",
-    "migrate:prod": "prisma migrate deploy",
-    "db:reset": "prisma migrate reset --force",
-    "db:setup": "npm run migrate:dev && npm run seed",
-    "db:deploy": "npm run migrate:prod && npm run seed"
+    "postinstall": "npm run prisma:generate && rm -rf public/themes && cp -R node_modules/primereact/resources/themes public/themes",
+    "prisma:db:seed": "prisma db seed",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "prisma:migrate:reset": "prisma migrate reset --force"
   },
   "dependencies": {
     "@prisma/client": "^6.8.2",
