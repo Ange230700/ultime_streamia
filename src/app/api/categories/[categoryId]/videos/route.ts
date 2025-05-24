@@ -53,13 +53,14 @@ async function getVideosByCategory(
 
 export async function GET(
   request: Request,
-  { params }: { params: { categoryId: string } },
+  { params }: { params: Promise<{ categoryId: string }> },
 ) {
   try {
+    const { categoryId: categoryIdStr } = await params;
+    const categoryId = parseInt(categoryIdStr, 10);
     const url = new URL(request.url);
     const offset = parseInt(url.searchParams.get("offset") ?? "0", 10);
     const limit = parseInt(url.searchParams.get("limit") ?? "10", 10);
-    const categoryId = parseInt(params.categoryId, 10);
 
     const { videos, total } = await getVideosByCategory(
       categoryId,
