@@ -8,6 +8,7 @@ import PropTypes from "prop-types";
 import { UserContext, User, UserContextType } from "@/app/contexts/UserContext";
 import authAxios, { setAccessToken } from "@/lib/authAxios";
 import type { ApiResponse } from "@/types/api-response";
+import isTokenExpired from "@/app/modules/isTokenExpired";
 
 let accessToken: string | null = null;
 let refreshAbortController: AbortController | null = null;
@@ -16,7 +17,9 @@ export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    refreshToken(); // Try refreshing on load
+    if (!accessToken || isTokenExpired(accessToken)) {
+      refreshToken();
+    }
   }, []);
 
   const refreshToken = async () => {

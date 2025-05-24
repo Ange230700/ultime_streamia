@@ -1,6 +1,7 @@
 // src\lib\authAxios.ts
 
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
+import isTokenExpired from "@/app/modules/isTokenExpired";
 import axiosRetry, {
   exponentialDelay,
   isNetworkOrIdempotentRequestError,
@@ -20,12 +21,22 @@ const authAxios: AxiosInstance = axios.create({
 });
 
 // ✅ Attach Authorization header
-authAxios.interceptors.request.use((config) => {
-  if (accessToken && config.headers) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
-  }
-  return config;
-});
+authAxios.interceptors.request.use(
+  async (config) => {
+    if (accessToken && isTokenExpired(accessToken)) {
+      const res = await axios.get<{ token: string }>("/api/auth/refresh", {
+        withCredentials: true,
+      });
+      accessToken = res.data.token;
+      setAccessToken(accessToken);
+    }
+    if (accessToken && config.headers) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+    return config;
+  },
+  (err: Error) => Promise.reject(err),
+);
 
 // ✅ Handle 401 responses
 authAxios.interceptors.response.use(
