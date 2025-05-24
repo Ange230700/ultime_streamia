@@ -1,6 +1,5 @@
 // src\app\api\categories\[categoryId]\videos\route.ts
 
-import { NextRequest } from "next/server";
 import { success, error } from "@/utils/apiResponse";
 import { prisma } from "@/lib/prisma";
 import type { Video } from "@/app/contexts/VideoContext";
@@ -53,7 +52,7 @@ async function getVideosByCategory(
 }
 
 export async function GET(
-  req: NextRequest,
+  req: Request,
   { params }: { params: { categoryId: string } },
 ) {
   try {
