@@ -13,7 +13,7 @@ import { UserContext } from "@/app/contexts/UserContext";
 
 export interface VideoCardProps {
   readonly video: Video & {
-    readonly cover_image_data?: string;
+    readonly thumbnail?: string;
   };
   readonly onPlay?: (video: Video) => void;
   readonly onAddToWatchlist?: (video: Video) => void;
@@ -32,7 +32,7 @@ export default function VideoCard({
 }: Readonly<VideoCardProps>) {
   const { user } = useContext(UserContext);
   const [imgError, setImgError] = useState(false);
-  const hasImage = Boolean(video.cover_image_data);
+  const hasImage = Boolean(video.thumbnail);
   const [isLoaded, setIsLoaded] = useState(!hasImage);
   const handleImageLoad = () => setIsLoaded(true);
 
@@ -55,7 +55,7 @@ export default function VideoCard({
 
   // Header image or spinner/avatar
   let headerImageContent: React.ReactNode;
-  if (!video.cover_image_data || imgError) {
+  if (!video.thumbnail || imgError) {
     headerImageContent = (
       <div className="flex aspect-video items-center justify-center rounded-t-lg">
         <Avatar icon="pi pi-image" size="xlarge" shape="circle" />
@@ -71,7 +71,7 @@ export default function VideoCard({
         )}
         <Image
           alt={video.video_title}
-          src={`data:image/svg+xml;base64,${video.cover_image_data}`}
+          src={`data:image/svg+xml;base64,${video.thumbnail}`}
           fill
           className={`rounded-t-lg object-cover transition-opacity duration-300 ${isLoaded ? "opacity-100" : "opacity-0"}`}
           onError={_handleError}

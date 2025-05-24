@@ -40,8 +40,8 @@ async function getVideosByCategory(
     video_title: v.video_title,
     video_description: v.video_description ?? undefined,
     is_available: v.is_available,
-    cover_image_data: v.cover_image_data
-      ? Buffer.from(v.cover_image_data).toString("base64")
+    thumbnail: v.thumbnail
+      ? Buffer.from(v.thumbnail).toString("base64")
       : undefined,
     categories: v.categories.map((cv) => ({
       category_id: Number(cv.category.category_id),

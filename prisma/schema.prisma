@@ -50,8 +50,7 @@ model video {
   video_id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
   video_title       String    @db.VarChar(255)
   video_description String?   @db.Text
-  card_image_data   Bytes?    @db.Blob
-  cover_image_data  Bytes?    @db.Blob
+  thumbnail    Bytes?    @db.Blob
   video_data        Bytes?    @db.Blob
   video_duration    DateTime? @db.Time(0)
   release_date      DateTime  @default(now()) // default to now if omitted

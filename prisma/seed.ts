@@ -75,12 +75,6 @@ async function main() {
   // 5. Create Videos
   const videos = await Promise.all(
     Array.from({ length: 20 }).map(() => {
-      const cardUri = faker.image.dataUri({
-        width: 384,
-        height: 216,
-        type: "svg-base64",
-      });
-
       const coverUri = faker.image.dataUri({
         width: 384,
         height: 216,
@@ -91,9 +85,8 @@ async function main() {
         data: {
           video_title: faker.lorem.words(3),
           video_description: faker.lorem.paragraph(),
-          card_image_data: dataUriToBytes(cardUri),
-          cover_image_data: dataUriToBytes(coverUri),
-          video_data: null,
+          thumbnail: dataUriToBytes(coverUri),
+          video_data: undefined,
           video_duration: faker.date.recent(),
           release_date: faker.date.past(),
           is_available: faker.datatype.boolean(),

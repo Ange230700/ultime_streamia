@@ -8,7 +8,7 @@ export interface Video {
   video_title: string;
   video_description?: string;
   is_available: boolean;
-  cover_image_data?: string;
+  thumbnail?: string;
   categories: {
     category_id: number;
     category_name: string;
