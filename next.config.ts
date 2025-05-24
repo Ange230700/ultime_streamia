@@ -2,6 +2,7 @@
 
 import type { NextConfig } from "next";
 
+/** @type {import('next').NextConfig} */
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
@@ -9,7 +10,7 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "setplex.com",
         port: "",
-        pathname: "/blog/**",
+        pathname: "/blog/wp-content/uploads/**",
       },
     ],
   },
