@@ -51,7 +51,10 @@ async function getVideosByCategory(
   return { videos, total };
 }
 
-export async function GET(request: Request, { params }) {
+export async function GET(
+  request: Request,
+  { params }: { params: { categoryId: string } },
+) {
   try {
     const url = new URL(request.url);
     const offset = parseInt(url.searchParams.get("offset") ?? "0", 10);
