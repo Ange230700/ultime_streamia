@@ -5,17 +5,16 @@ export const dynamic = "force-dynamic";
 import React, { Suspense } from "react";
 import SearchResultClient from "./SearchResultClient";
 
-export default function Page({
+export default async function Page({
   searchParams,
 }: Readonly<{
-  searchParams: { query?: string };
+  searchParams: Promise<{ query?: string }>;
 }>) {
-  // pull query on the server and pass down if you like,
-  // or let the client hook handle it inside the client component
+  const { query } = await searchParams;
   return (
     <div className="p-4">
       <h1 className="mb-4 text-2xl font-semibold">
-        Search Results for “{searchParams.query ?? ""}”
+        Search Results for “{query ?? ""}”
       </h1>
       <Suspense fallback={<p>Loading search results…</p>}>
         <SearchResultClient />
