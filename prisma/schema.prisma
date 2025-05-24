@@ -24,14 +24,14 @@ model user {
   email     String  @unique @db.VarChar(255) // email already unique
   password  String  @db.VarChar(255)
   is_admin  Boolean @default(false)
-  avatar_id BigInt  @db.UnsignedBigInt
+  avatar_id BigInt? @db.UnsignedBigInt
 
   comment        comment[]
   favorite       favorite[]
   watchlist      watchlist[]
   refresh_tokens refresh_token[]
 
-  avatar avatar @relation(fields: [avatar_id], references: [avatar_id], onDelete: Cascade)
+  avatar avatar? @relation(fields: [avatar_id], references: [avatar_id], onDelete: Cascade)
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt

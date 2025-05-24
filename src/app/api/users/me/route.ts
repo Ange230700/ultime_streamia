@@ -30,7 +30,7 @@ export async function GET(request: Request) {
 
     // 3) Convert avatar image_data -> data URI if present
     let avatarUrl: string | undefined;
-    if (dbUser.avatar.image_data) {
+    if (dbUser.avatar?.image_data) {
       const b64 = Buffer.from(dbUser.avatar.image_data).toString("base64");
       // adjust MIME if you know it's e.g. PNG
       avatarUrl = `data:image/jpeg;base64,${b64}`;

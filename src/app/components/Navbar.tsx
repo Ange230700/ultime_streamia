@@ -53,11 +53,6 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <Avatar
             image={user.avatarUrl}
-            label={
-              !user.avatarUrl
-                ? user.username.charAt(0).toUpperCase()
-                : undefined
-            }
             shape="circle"
             size="large"
             style={{ cursor: "pointer" }}

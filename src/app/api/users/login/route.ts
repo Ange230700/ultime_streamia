@@ -45,12 +45,15 @@ async function handleLogin(request: Request, data: LoginInput) {
   });
 
   // after you fetch `user` from the DB
-  const avatar = await prisma.avatar.findUnique({
-    where: { avatar_id: user.avatar_id },
-  });
-  const avatarUrl = avatar?.image_data
-    ? `data:image/jpeg;base64,${Buffer.from(avatar.image_data).toString("base64")}`
-    : undefined;
+  let avatarUrl: string | undefined;
+  if (user.avatar_id) {
+    const av = await prisma.avatar.findUnique({
+      where: { avatar_id: user.avatar_id },
+    });
+    if (av?.image_data) {
+      avatarUrl = `data:image/jpeg;base64,${Buffer.from(av.image_data).toString("base64")}`;
+    }
+  }
 
   // Prepare response with access token and user info
   const res = success(

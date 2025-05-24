@@ -43,14 +43,16 @@ async function main() {
     Array.from({ length: 20 }).map(async () => {
       const plain = faker.internet.password({ length: 12 });
       const hash = await bcrypt.hash(plain, SALT_ROUNDS);
-      const avatar = faker.helpers.arrayElement(avatars);
+      const maybeAvatar = faker.datatype.boolean(0.7)
+        ? faker.helpers.arrayElement(avatars)
+        : undefined;
       return prisma.user.create({
         data: {
           username: faker.internet.username(),
           email: faker.internet.email(),
           password: hash,
           is_admin: faker.datatype.boolean(0.1),
-          avatar_id: avatar.avatar_id,
+          avatar_id: maybeAvatar?.avatar_id ?? undefined,
         },
       });
     }),

@@ -17,13 +17,6 @@ async function handleRegister(request: Request, data: RegisterInput) {
     return error("Email is already in use", 400);
   }
 
-  // 2) Decide on an avatar_id for new users
-  //    (your schema requires avatar_id non-null)
-  const defaultAvatar = await prisma.avatar.findFirst();
-  if (!defaultAvatar) {
-    return error("No default avatar available", 500);
-  }
-
   // 3) Hash & create
   const hash = await bcrypt.hash(password, SALT_ROUNDS);
   const user = await prisma.user.create({
@@ -31,7 +24,6 @@ async function handleRegister(request: Request, data: RegisterInput) {
       username,
       email,
       password: hash,
-      avatar_id: defaultAvatar.avatar_id,
     },
   });
 
