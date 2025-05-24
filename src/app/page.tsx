@@ -56,6 +56,7 @@ export default function Home() {
             alt="hero-1"
             className="object-cover md:ml-auto md:h-full"
             style={{ clipPath: clip, transition: "clip-path 0.3s ease" }}
+            unoptimized
           />
         </div>
       </div>
