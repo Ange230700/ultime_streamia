@@ -76,6 +76,7 @@ export default function SearchResultClient() {
               key={video.video_id}
               video={video}
               onPlay={() => router.push(`/videos/${video.video_id}`)}
+              onDetails={() => router.push(`/videos/${video.video_id}`)}
             />
           ))}
         </div>

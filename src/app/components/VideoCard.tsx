@@ -4,6 +4,7 @@
 
 import Image from "next/image";
 import React, { useState, useContext } from "react";
+import { useRouter } from "next/navigation";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { Avatar } from "primereact/avatar";
@@ -18,6 +19,7 @@ export interface VideoCardProps {
   readonly onPlay?: (video: Video) => void;
   readonly onAddToWatchlist?: (video: Video) => void;
   readonly onAddToFavorites?: (video: Video) => void;
+  readonly onDetails?: (video: Video) => void;
   className?: string;
   loading?: boolean;
 }
@@ -27,9 +29,11 @@ export default function VideoCard({
   onPlay,
   onAddToWatchlist,
   onAddToFavorites,
+  onDetails,
   className = "",
   loading = false,
 }: Readonly<VideoCardProps>) {
+  const router = useRouter();
   const { user } = useContext(UserContext);
   const [imgError, setImgError] = useState(false);
   const hasImage = Boolean(video.thumbnail);
@@ -123,6 +127,11 @@ export default function VideoCard({
             icon="pi pi-list"
             className="p-button-rounded p-button-outlined"
             aria-label="video details"
+            onClick={() =>
+              onDetails
+                ? onDetails(video)
+                : router.push(`/videos/${video.video_id}`)
+            }
           />
         </>
       }

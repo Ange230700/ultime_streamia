@@ -3,6 +3,7 @@
 "use client";
 
 import React, { useContext } from "react";
+import { useRouter } from "next/navigation";
 import { Carousel, CarouselResponsiveOption } from "primereact/carousel";
 import { Skeleton } from "primereact/skeleton";
 import { Video } from "@/app/contexts/VideoContext";
@@ -28,6 +29,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   videos,
   loading,
 }) => {
+  const router = useRouter();
   // Move useContext into component
   const showToast = useContext(ToastContext);
   const { user } = useContext(UserContext);
@@ -68,6 +70,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
             life: 3000,
           })
         }
+        onDetails={() => router.push(`/videos/${video.video_id}`)}
       />
     </div>
   );
