@@ -56,8 +56,7 @@ export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
     >("/api/users/login", { email, password }, { withCredentials: true });
 
     if (res.data.success) {
-      accessToken = res.data.data.token;
-      setAccessToken(accessToken);
+      setAccessToken(res.data.data.token);
       setUser(res.data.data.user);
     } else {
       throw new Error(res.data.error);
@@ -75,8 +74,24 @@ export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
     } catch {}
   };
 
+  const update = async (updatedUser: User) => {
+    const res = await authAxios.put<ApiResponse<User>>(
+      "/api/users/me",
+      { email: updatedUser.email, username: updatedUser.username },
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+
+    if (res.data.success) {
+      setUser(res.data.data);
+    } else {
+      throw new Error(res.data.error);
+    }
+  };
+
   const value = useMemo<UserContextType>(
-    () => ({ user, login, logout }),
+    () => ({ user, login, logout, update }),
     [user],
   );
 
