@@ -19,9 +19,6 @@ export default function ThemeStyles() {
     link.rel = "stylesheet";
     link.href = `/themes/soho-${theme}/theme.css`;
     document.head.appendChild(link);
-
-    // optional: debug
-    console.log("Loaded theme:", link.href);
   }, [theme]);
 
   return null;
