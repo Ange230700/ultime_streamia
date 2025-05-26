@@ -44,12 +44,19 @@ export async function GET(
       thumbnail = Buffer.from(v.thumbnail).toString("base64");
     }
 
+    // convert blob → base64 video data
+    let videoData: string | undefined;
+    if (v.video_data) {
+      videoData = Buffer.from(v.video_data).toString("base64");
+    }
+
     const payload = {
       video_id: Number(v.video_id),
       video_title: v.video_title,
       video_description: v.video_description,
       is_available: v.is_available,
       thumbnail,
+      video_data: videoData,
       categories: v.categories.map((cv) => ({
         category_id: Number(cv.category.category_id),
         category_name: cv.category.category_name,

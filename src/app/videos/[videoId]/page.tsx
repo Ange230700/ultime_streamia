@@ -20,6 +20,7 @@ interface VideoDetails {
   video_description?: string;
   is_available: boolean;
   thumbnail?: string;
+  video_data?: string;
   categories: { category_id: number; category_name: string }[];
 }
 
@@ -79,6 +80,41 @@ export default function VideoDetailsPage() {
     );
   }
 
+  // 1) Build the mediaContent variable:
+  let mediaContent: React.ReactNode = null;
+  if (video?.video_data) {
+    mediaContent = (
+      <div className="w-full">
+        <video
+          controls
+          className="aspect-video w-full rounded-lg shadow-md"
+          src={`data:video/mp4;base64,${video.video_data}`}
+        >
+          <track
+            default
+            kind="captions"
+            src="/captions/en.vtt"
+            srcLang="en"
+            label="English"
+          />
+          Sorry, your browser doesn’t support embedded videos.
+        </video>
+      </div>
+    );
+  } else if (video?.thumbnail) {
+    mediaContent = (
+      <div className="relative aspect-video w-full overflow-hidden rounded-lg shadow-md">
+        <Image
+          src={`data:image/svg+xml;base64,${video.thumbnail}`}
+          alt={video.video_title}
+          fill
+          unoptimized
+          className="object-cover"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-6">
       {/* Title */}
@@ -98,18 +134,8 @@ export default function VideoDetailsPage() {
         {video?.video_description ?? "No description provided."}
       </p>
 
-      {/* Thumbnail */}
-      {video?.thumbnail && (
-        <div className="relative aspect-video w-full overflow-hidden rounded-lg shadow-md">
-          <Image
-            src={`data:image/svg+xml;base64,${video.thumbnail}`}
-            alt={video.video_title}
-            fill
-            unoptimized
-            className="object-cover"
-          />
-        </div>
-      )}
+      {/* Video or thumbnail */}
+      {mediaContent}
 
       {/* Actions */}
       <div className="flex gap-4">
