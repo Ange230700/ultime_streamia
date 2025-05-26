@@ -23,8 +23,10 @@ export default function ProfilePage() {
   const { user, logout, update } = useUser();
   const showToast = useContext(ToastContext);
 
+  const [editableUsername, setEditableUsername] = useState("");
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [editableEmail, setEditableEmail] = useState("");
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | undefined>(
     user?.avatarUrl,
@@ -38,17 +40,19 @@ export default function ProfilePage() {
   // initialize form when user loads
   useEffect(() => {
     if (user) {
-      setEditableEmail(user.email);
-      setAvatarPreview(user.avatarUrl);
+      if (isEditingUsername) setEditableUsername(user.username);
+      if (isEditingEmail) setEditableEmail(user.email);
+      if (avatarFile) setAvatarPreview(user.avatarUrl);
     }
-  }, [user]);
+  }, [user, isEditingUsername, isEditingEmail, avatarFile]);
 
   if (!user) return <p className="p-4">Loading profile…</p>;
 
   async function saveProfile() {
     try {
       const form = new FormData();
-      form.append("email", editableEmail);
+      if (isEditingUsername) form.append("username", editableUsername);
+      if (isEditingEmail) form.append("email", editableEmail);
       if (avatarFile) form.append("avatar", avatarFile);
       // you’ll need to implement this endpoint:
       const res = await authAxios.put<ApiResponse<User>>(
@@ -65,7 +69,9 @@ export default function ProfilePage() {
         summary: "Profile Saved",
         detail: "Your changes have been saved.",
       });
-      setIsEditing(false);
+      setIsEditingUsername(false);
+      setIsEditingEmail(false);
+      setAvatarFile(null);
     } catch (err: unknown) {
       showToast({
         severity: "error",
@@ -146,11 +152,49 @@ export default function ProfilePage() {
         <h2 className="text-2xl font-bold">{user.username}</h2>
       </div>
 
+      {/* Username Field */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <label className="flex items-center gap-4 font-medium">
+            Username:
+            {isEditingUsername ? (
+              <InputText
+                value={editableUsername}
+                onChange={(e) => setEditableUsername(e.target.value)}
+                className="w-full"
+              />
+            ) : (
+              <p>{user.username}</p>
+            )}
+          </label>
+        </div>
+        <div className="flex space-x-2">
+          {isEditingUsername ? (
+            <div className="flex justify-end gap-2">
+              <Button
+                label="Cancel"
+                text
+                onClick={() => setIsEditingUsername(false)}
+              />
+              <Button label="Save" icon="pi pi-check" onClick={saveProfile} />
+            </div>
+          ) : (
+            <Button
+              label="Edit Username"
+              icon="pi pi-pencil"
+              onClick={() => setIsEditingUsername(true)}
+            />
+          )}
+        </div>
+      </div>
+      <hr />
+
+      {/* Email Field */}
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <label className="flex items-center gap-4 font-medium">
             Email:
-            {isEditing ? (
+            {isEditingEmail ? (
               <InputText
                 value={editableEmail}
                 onChange={(e) => setEditableEmail(e.target.value)}
@@ -161,24 +205,25 @@ export default function ProfilePage() {
             )}
           </label>
         </div>
-
-        {/* Actions */}
-        <div className="flex justify-between">
-          {isEditing ? (
-            <>
-              <Button label="Cancel" text onClick={() => setIsEditing(false)} />
+        <div className="flex space-x-2">
+          {isEditingEmail ? (
+            <div className="flex justify-end gap-2">
+              <Button
+                label="Cancel"
+                text
+                onClick={() => setIsEditingEmail(false)}
+              />
               <Button label="Save" icon="pi pi-check" onClick={saveProfile} />
-            </>
+            </div>
           ) : (
             <Button
-              label="Edit Profile"
+              label="Edit Email"
               icon="pi pi-pencil"
-              onClick={() => setIsEditing(true)}
+              onClick={() => setIsEditingEmail(true)}
             />
           )}
         </div>
       </div>
-
       <hr />
 
       <div className="flex justify-end">
