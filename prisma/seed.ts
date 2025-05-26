@@ -129,17 +129,20 @@ async function main() {
   );
   console.log(`✔️  Created ${videos.length} videos`);
 
-  const allIds = videos.map((v) => Number(v.video_id));
-  const shuffled = faker.helpers.shuffle(allIds);
-  const half = shuffled.slice(0, Math.floor(shuffled.length / 2));
-
-  // make exactly these “half” open
+  // 1) slam everything closed
   await prisma.video.updateMany({
-    where: { video_id: { in: half.map((id) => BigInt(id)) } },
-    data: { is_available: true },
+    data: { is_available: false },
   });
-  // the other half stay false by our earlier updateMany
-  console.log("🔐 Random half unlocked for visitors");
+
+  // 2) re-open exactly half (even IDs)
+  //    MySQL’s MOD() works on BIGINTs here
+  await prisma.$executeRaw`
+    UPDATE video
+       SET is_available = true
+     WHERE MOD(video_id, 2) = 0
+  `;
+
+  console.log("🔐 Locked half, unlocked the even-ID videos by default");
 
   // 6. Link videos to random categories
   for (const video of videos) {
