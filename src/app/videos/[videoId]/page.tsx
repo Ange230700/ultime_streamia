@@ -1,6 +1,7 @@
 // src/app/videos/[videoId]/page.tsx
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState, useContext } from "react";
@@ -36,6 +37,7 @@ export default function VideoDetailsPage() {
   useEffect(() => {
     async function fetchVideo() {
       setLoading(true);
+      setError(null);
       try {
         const res = await http.get<ApiResponse<VideoDetails>>(
           `/api/videos/${videoId}`,
@@ -56,7 +58,10 @@ export default function VideoDetailsPage() {
         setLoading(false);
       }
     }
-    fetchVideo();
+
+    if (videoId) {
+      fetchVideo();
+    }
   }, [videoId, showToast]);
 
   if (loading) {
@@ -67,7 +72,13 @@ export default function VideoDetailsPage() {
     );
   }
 
-  if (error) return <p className="p-4 text-center">There was an error.</p>;
+  if (error) {
+    return (
+      <p className="p-4 text-center">
+        There was an error loading the video: {error}
+      </p>
+    );
+  }
 
   // If video locked for visitors
   if (video && !video.is_available && !user) {
@@ -82,8 +93,9 @@ export default function VideoDetailsPage() {
     );
   }
 
-  // 1) Build the mediaContent variable:
-  let mediaContent: React.ReactNode = null;
+  // Build the mediaContent variable
+  let mediaContent: React.ReactNode;
+
   if (video?.video_data && !videoError) {
     mediaContent = (
       <div className="w-full">
@@ -118,12 +130,28 @@ export default function VideoDetailsPage() {
         className="relative aspect-video w-full overflow-hidden rounded-lg shadow-md"
         style={{ backgroundColor: "var(--highlight-bg)" }}
       >
-        {videoError && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-lg">
+        {!videoError ? (
+          <Image
+            src={`data:image/svg+xml;base64,${video.thumbnail}`}
+            alt={`${video.video_title} thumbnail"`}
+            className="object-cover"
+            fill
+          />
+        ) : (
+          <div
+            className="absolute inset-0 flex flex-col items-center justify-center"
+            style={{ backgroundColor: "var(--highlight-bg)" }}
+          >
             <Avatar icon="pi pi-video" size="xlarge" shape="circle" />
             <p>⚠️ Video failed to load</p>
           </div>
         )}
+      </div>
+    );
+  } else {
+    mediaContent = (
+      <div className="p-4 text-center text-lg">
+        No preview available for this video.
       </div>
     );
   }
