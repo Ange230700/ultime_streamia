@@ -2,14 +2,19 @@
 
 import { success, error } from "@/utils/apiResponse";
 import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { videoId: string } },
+  { params }: { params: Promise<{ videoId: string }> },
 ) {
-  const id = parseInt(params.videoId, 10);
+  const { videoId } = await params;
+  const id = parseInt(videoId, 10);
   if (isNaN(id)) {
-    return error("Invalid video ID", 400);
+    return NextResponse.json(
+      { success: false, error: "Invalid ID" },
+      { status: 400 },
+    );
   }
 
   try {
