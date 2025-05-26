@@ -13,6 +13,7 @@ import { Button } from "primereact/button";
 import { Chip } from "primereact/chip";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { useUser } from "@/app/hooks/useUser";
+import { useAdmin } from "@/app/hooks/useAdmin";
 import { ToastContext } from "@/app/ClientLayout";
 
 interface VideoDetails {
@@ -28,6 +29,7 @@ interface VideoDetails {
 export default function VideoDetailsPage() {
   const { videoId } = useParams();
   const { user } = useUser();
+  const { adminView } = useAdmin();
   const showToast = useContext(ToastContext);
   const [video, setVideo] = useState<VideoDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -217,6 +219,27 @@ export default function VideoDetailsPage() {
           }
         />
       </div>
+
+      {/* ─── Admin‐only controls ───────────────────────────────────────── */}
+      {user?.is_admin && adminView && (
+        <div className="flex gap-3">
+          <Button
+            icon="pi pi-pencil"
+            label="Edit Video"
+            onClick={() => {
+              /* open your edit dialog or navigate */
+            }}
+          />
+          <Button
+            icon="pi pi-trash"
+            label="Delete Video"
+            severity="danger"
+            onClick={() => {
+              /* call delete API + refetch/list redirect */
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

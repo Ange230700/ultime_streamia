@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Menubar } from "primereact/menubar";
 import { InputText } from "primereact/inputtext";
+import { InputSwitch, InputSwitchChangeEvent } from "primereact/inputswitch";
 import { MenuItem } from "primereact/menuitem";
 import { Button } from "primereact/button";
 import { Avatar } from "primereact/avatar";
@@ -23,6 +24,7 @@ export default function Navbar() {
   const { theme, toggle } = useTheme();
   const router = useRouter();
   const { user, logout } = useContext(UserContext);
+  const [adminView, setAdminView] = useState<boolean>(false);
   const [searchText, setSearchText] = useState("");
 
   // Debounce and navigate on searchText change
@@ -46,55 +48,65 @@ export default function Navbar() {
     },
   ];
 
+  // Conditionally append Admin‐only items
+  if (user?.is_admin && adminView) {
+    items.push(
+      {
+        label: "Admin Dashboard",
+        icon: "pi pi-shield",
+        command: () => router.push("/admin/dashboard"),
+      },
+      {
+        label: "User Management",
+        icon: "pi pi-users",
+        command: () => router.push("/admin/users"),
+      },
+      {
+        label: "Content Review",
+        icon: "pi pi-eye",
+        command: () => router.push("/admin/content"),
+      },
+    );
+  }
+
   let authControls: React.ReactNode;
   if (user) {
-    if (user.avatarUrl) {
-      authControls = (
-        <div className="flex items-center gap-2">
-          <Avatar
-            image={user.avatarUrl}
-            shape="circle"
-            size="large"
-            style={{ cursor: "pointer" }}
-            onClick={() => router.push("/profile")}
-          />
-          <Button
-            icon="pi pi-sign-out"
-            rounded
-            aria-label="Logout"
-            onClick={async () => {
-              await logout();
-              router.push("/login");
-            }}
-          />
-        </div>
-      );
-    } else {
-      authControls = (
-        <div className="flex items-center gap-2">
-          <Avatar
-            label={user.username.charAt(0).toUpperCase()}
-            shape="circle"
-            size="large"
-            style={{
-              cursor: "pointer",
-              backgroundColor: "var(--primary-color)",
-              color: "var(--text-color)",
-            }}
-            onClick={() => router.push("/profile")}
-          />
-          <Button
-            icon="pi pi-sign-out"
-            rounded
-            aria-label="Logout"
-            onClick={async () => {
-              await logout();
-              router.push("/login");
-            }}
-          />
-        </div>
-      );
-    }
+    const avatar = user.avatarUrl ? (
+      <Avatar
+        image={user.avatarUrl}
+        shape="circle"
+        size="large"
+        style={{ cursor: "pointer" }}
+        onClick={() => router.push("/profile")}
+      />
+    ) : (
+      <Avatar
+        label={user.username.charAt(0).toUpperCase()}
+        shape="circle"
+        size="large"
+        style={{
+          cursor: "pointer",
+          backgroundColor: "var(--primary-color)",
+          color: "var(--text-color)",
+        }}
+        onClick={() => router.push("/profile")}
+      />
+    );
+
+    authControls = (
+      <div className="flex items-center gap-2">
+        {avatar}
+        <Button
+          icon="pi pi-sign-out"
+          rounded
+          aria-label="Logout"
+          onClick={async () => {
+            await logout();
+            router.push("/login");
+          }}
+        />
+      </div>
+    );
   } else {
     authControls = (
       <Button
@@ -127,6 +139,19 @@ export default function Navbar() {
         aria-label="Toggle theme"
         onClick={toggle}
       />
+
+      {/* Admin View toggle (only for admins) */}
+      {user?.is_admin && (
+        <div className="flex items-center gap-2">
+          <span className="font-medium">Admin View</span>
+          <InputSwitch
+            checked={adminView}
+            onChange={(e: InputSwitchChangeEvent) => setAdminView(e.value)}
+          />
+        </div>
+      )}
+
+      {/* Login / Logout */}
       {authControls}
     </div>
   );
