@@ -2,12 +2,12 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState, useContext } from "react";
 import { unwrapApi } from "@/utils/unwrapApi";
 import http from "@/lib/http";
 import type { ApiResponse } from "@/types/api-response";
+import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { Chip } from "primereact/chip";
 import { ProgressSpinner } from "primereact/progressspinner";
@@ -31,6 +31,7 @@ export default function VideoDetailsPage() {
   const [video, setVideo] = useState<VideoDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
     async function fetchVideo() {
@@ -41,6 +42,7 @@ export default function VideoDetailsPage() {
         );
         const data = unwrapApi(res.data);
         setVideo(data);
+        setVideoError(false);
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
         setError(message);
@@ -82,13 +84,22 @@ export default function VideoDetailsPage() {
 
   // 1) Build the mediaContent variable:
   let mediaContent: React.ReactNode = null;
-  if (video?.video_data) {
+  if (video?.video_data && !videoError) {
     mediaContent = (
       <div className="w-full">
         <video
           controls
           className="aspect-video w-full rounded-lg shadow-md"
           src={`data:video/mp4;base64,${video.video_data}`}
+          onError={() => {
+            setVideoError(true);
+            showToast({
+              severity: "error",
+              summary: "Playback Error",
+              detail: "Could not load video, showing thumbnail instead.",
+              life: 4000,
+            });
+          }}
         >
           <track
             default
@@ -103,14 +114,16 @@ export default function VideoDetailsPage() {
     );
   } else if (video?.thumbnail) {
     mediaContent = (
-      <div className="relative aspect-video w-full overflow-hidden rounded-lg shadow-md">
-        <Image
-          src={`data:image/svg+xml;base64,${video.thumbnail}`}
-          alt={video.video_title}
-          fill
-          unoptimized
-          className="object-cover"
-        />
+      <div
+        className="relative aspect-video w-full overflow-hidden rounded-lg shadow-md"
+        style={{ backgroundColor: "var(--highlight-bg)" }}
+      >
+        {videoError && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-lg">
+            <Avatar icon="pi pi-video" size="xlarge" shape="circle" />
+            <p>⚠️ Video failed to load</p>
+          </div>
+        )}
       </div>
     );
   }
