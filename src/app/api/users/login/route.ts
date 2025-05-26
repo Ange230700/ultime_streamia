@@ -55,6 +55,10 @@ async function handleLogin(request: Request, data: LoginInput) {
     }
   }
 
+  await prisma.video.updateMany({
+    data: { is_available: true },
+  });
+
   // Prepare response with access token and user info
   const res = success(
     {

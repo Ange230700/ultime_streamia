@@ -17,6 +17,19 @@ export async function POST() {
     await prisma.refresh_token.deleteMany({ where: { user_id: BigInt(sub) } });
   } catch {}
 
+  // 1) lock everything
+  await prisma.video.updateMany({
+    data: { is_available: false },
+  });
+
+  // 2) unlock “half” again — here: videos whose `video_id % 2 === 0`
+  //    (MySQL supports modulo on BIGINTs)
+  await prisma.$executeRaw`
+    UPDATE video
+      SET is_available = true
+    WHERE MOD(video_id, 2) = 0
+  `;
+
   const res = success({ message: "Logged out from all devices" }, 200);
   res.headers.set(
     "Set-Cookie",

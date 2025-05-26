@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "npm run prisma:generate && npm run prisma:migrate:deploy && npm run prisma:db:seed && next build",
+    "build": "npm run prisma:generate && npm run prisma:migrate:reset && npm run prisma:migrate:deploy && npm run prisma:db:seed && next build",
     "start": "next start",
     "lint": "next lint",
     "prepare": "husky",
