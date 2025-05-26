@@ -9,7 +9,6 @@ import { Skeleton } from "primereact/skeleton";
 import { Video } from "@/app/contexts/VideoContext";
 import VideoCard from "@/app/components/VideoCard";
 import { ToastContext } from "@/app/ClientLayout";
-import { UserContext } from "@/app/contexts/UserContext";
 
 export interface CategorySectionProps {
   title: string;
@@ -32,12 +31,9 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   const router = useRouter();
   // Move useContext into component
   const showToast = useContext(ToastContext);
-  const { user } = useContext(UserContext);
 
   // Only show available videos to visitors; logged-in users see all
-  const videosToDisplay = user
-    ? videos
-    : videos.filter((video) => video.is_available);
+  const videosToDisplay = videos;
 
   // Define template here to use showToast
   const videoItemTemplate = (video: Video) => (
