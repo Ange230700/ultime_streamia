@@ -71,17 +71,28 @@ export default function Navbar() {
       );
     } else {
       authControls = (
-        <Avatar
-          label={user.username.charAt(0).toUpperCase()}
-          shape="circle"
-          size="large"
-          style={{
-            cursor: "pointer",
-            backgroundColor: "var(--primary-color)",
-            color: "var(--text-color)",
-          }}
-          onClick={() => router.push("/profile")}
-        />
+        <div className="flex items-center gap-2">
+          <Avatar
+            label={user.username.charAt(0).toUpperCase()}
+            shape="circle"
+            size="large"
+            style={{
+              cursor: "pointer",
+              backgroundColor: "var(--primary-color)",
+              color: "var(--text-color)",
+            }}
+            onClick={() => router.push("/profile")}
+          />
+          <Button
+            icon="pi pi-sign-out"
+            rounded
+            aria-label="Logout"
+            onClick={async () => {
+              await logout();
+              router.push("/login");
+            }}
+          />
+        </div>
       );
     }
   } else {

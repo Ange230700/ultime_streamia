@@ -69,7 +69,7 @@ export default function VideoDetailsPage() {
   // If video locked for visitors
   if (video && !video.is_available && !user) {
     return (
-      <p className="p-4 text-center text-xl">
+      <p className="my-auto p-4 text-center text-2xl">
         This video is unavailable.{" "}
         <Link href="/login" className="underline">
           Log in
