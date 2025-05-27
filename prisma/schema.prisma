@@ -14,7 +14,7 @@ model avatar {
   image_data Bytes? @db.Blob
   users      user[]
 
-  created_at DateTime @default(now())
+  created_at DateTime  @default(now())
   updated_at DateTime?
 }
 
@@ -50,8 +50,8 @@ model video {
   video_id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
   video_title       String    @db.VarChar(255)
   video_description String?   @db.Text
-  thumbnail    Bytes?    @db.Blob
-  video_data        Bytes?    @db.Blob
+  thumbnail         Bytes?    @db.Blob
+  video_data        Bytes?    @db.LongBlob
   video_duration    DateTime? @db.Time(0)
   release_date      DateTime  @default(now()) // default to now if omitted
   is_available      Boolean   @default(true)
