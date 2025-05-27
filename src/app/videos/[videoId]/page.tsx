@@ -182,7 +182,7 @@ export default function VideoDetailsPage() {
 
       {/* Actions */}
       <div className="flex gap-4">
-        <Button
+        {/* <Button
           icon="pi pi-play"
           label="Play"
           onClick={() =>
@@ -193,7 +193,7 @@ export default function VideoDetailsPage() {
               life: 3000,
             })
           }
-        />
+        /> */}
         <Button
           icon="pi pi-heart"
           label="Favorite"

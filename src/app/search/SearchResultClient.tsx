@@ -75,7 +75,7 @@ export default function SearchResultClient() {
             <VideoCard
               key={video.video_id}
               video={video}
-              onPlay={() => router.push(`/videos/${video.video_id}`)}
+              // onPlay={() => router.push(`/videos/${video.video_id}`)}
               onDetails={() => router.push(`/videos/${video.video_id}`)}
             />
           ))}

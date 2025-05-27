@@ -42,14 +42,14 @@ const CategorySection: React.FC<CategorySectionProps> = ({
         className="h-full"
         video={video}
         loading={false}
-        onPlay={() =>
-          showToast({
-            severity: "info",
-            summary: "Playing",
-            detail: video.video_title,
-            life: 3000,
-          })
-        }
+        // onPlay={() =>
+        //   showToast({
+        //     severity: "info",
+        //     summary: "Playing",
+        //     detail: video.video_title,
+        //     life: 3000,
+        //   })
+        // }
         onAddToWatchlist={() =>
           showToast({
             severity: "success",

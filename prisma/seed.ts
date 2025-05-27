@@ -9,7 +9,7 @@ import { urlToBytes, dataUriToBytes } from "@/utils/seedUtils";
 
 dotenv.config();
 
-const SALT_ROUNDS = 10;
+const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS ?? "10", 10);
 
 async function safeDelete(fn: () => Promise<unknown>, name: string) {
   const MAX = 5;

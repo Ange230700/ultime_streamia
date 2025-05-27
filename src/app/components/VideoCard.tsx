@@ -16,7 +16,7 @@ export interface VideoCardProps {
   readonly video: Video & {
     readonly thumbnail?: string;
   };
-  readonly onPlay?: (video: Video) => void;
+  // readonly onPlay?: (video: Video) => void;
   readonly onAddToWatchlist?: (video: Video) => void;
   readonly onAddToFavorites?: (video: Video) => void;
   readonly onDetails?: (video: Video) => void;
@@ -26,7 +26,7 @@ export interface VideoCardProps {
 
 export default function VideoCard({
   video,
-  onPlay,
+  // onPlay,
   onAddToWatchlist,
   onAddToFavorites,
   onDetails,
@@ -107,12 +107,12 @@ export default function VideoCard({
     <div className="flex justify-end gap-2 p-2">
       {
         <>
-          <Button
+          {/* <Button
             icon="pi pi-play"
             className="p-button-rounded p-button-outlined"
             aria-label="Play"
             onClick={() => onPlay?.(video)}
-          />
+          /> */}
           <Button
             icon="pi pi-heart"
             className="p-button-rounded p-button-outlined"
