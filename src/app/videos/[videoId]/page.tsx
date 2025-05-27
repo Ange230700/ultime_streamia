@@ -49,6 +49,8 @@ export default function VideoDetailsPage() {
   const [newThumbnail, setNewThumbnail] = useState<File | null>(null);
   const [thumbPreview, setThumbPreview] = useState<string | undefined>();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const [newVideoFile, setNewVideoFile] = useState<File | null>(null);
 
   useEffect(() => {
     async function fetchVideo() {
@@ -109,6 +111,7 @@ export default function VideoDetailsPage() {
       form.append("video_title", editableTitle);
       form.append("video_description", editableDesc);
       if (newThumbnail) form.append("thumbnail", newThumbnail);
+      if (newVideoFile) form.append("video_data", newVideoFile);
 
       const res = await http.put<ApiResponse<VideoDetails>>(
         `/api/videos/${video.video_id}`,
@@ -197,9 +200,10 @@ export default function VideoDetailsPage() {
     mediaContent = (
       <div className="relative aspect-video w-full overflow-hidden rounded-lg shadow-md">
         <Image
-          src={`data:image/png;base64,${video.thumbnail}`}
+          src={`data:image/png;base64,${video?.thumbnail}`}
           alt="thumbnail"
           fill
+          unoptimized
           className="object-cover"
         />
       </div>
@@ -321,7 +325,7 @@ export default function VideoDetailsPage() {
             Thumbnail
             <div className="flex items-center gap-4">
               {thumbPreview && (
-                <div className="relative aspect-video w-32 overflow-hidden rounded">
+                <div className="relative aspect-video w-full overflow-hidden rounded">
                   <Image
                     src={thumbPreview}
                     alt="Preview"
@@ -341,6 +345,29 @@ export default function VideoDetailsPage() {
                 ref={fileInputRef}
                 className="hidden"
                 onChange={onThumbChange}
+              />
+            </div>
+          </label>
+
+          <label className="block font-medium">
+            Video File
+            <div className="flex items-center gap-4">
+              {newVideoFile && (
+                <span className="text-sm italic">{newVideoFile.name}</span>
+              )}
+              <Button
+                label="Choose Video"
+                onClick={() => videoInputRef.current?.click()}
+              />
+              <input
+                type="file"
+                accept="video/*"
+                ref={videoInputRef}
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] ?? null;
+                  setNewVideoFile(file);
+                }}
               />
             </div>
           </label>
