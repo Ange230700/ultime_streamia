@@ -22,6 +22,7 @@
     "bcrypt": "^5.1.1",
     "clsx": "^2.1.1",
     "cookie": "^1.0.2",
+    "dotenv": "^16.5.0",
     "jsonwebtoken": "^9.0.2",
     "next": "^15.1.8",
     "node-fetch": "^3.3.2",

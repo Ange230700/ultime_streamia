@@ -1,10 +1,13 @@
 // prisma\seed.ts
 
+import dotenv from "dotenv";
 import { Prisma } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { faker } from "@faker-js/faker";
 import { prisma } from "@/lib/prisma";
 import { urlToBytes, dataUriToBytes } from "@/utils/seedUtils";
+
+dotenv.config();
 
 const SALT_ROUNDS = 10;
 
@@ -53,6 +56,60 @@ async function main() {
 
   // 1. Clean up in the right order
   await cleanup();
+
+  // 2) Seed a known admin with hard‐coded credentials
+  const adminEmail = "admin@streamia.test";
+  const adminPassword = "admin1234";
+  const adminUsername = "admin";
+
+  const existingAdmin = await prisma.user.findUnique({
+    where: { email: adminEmail },
+  });
+
+  if (!existingAdmin) {
+    const hash = await bcrypt.hash(adminPassword, SALT_ROUNDS);
+    await prisma.user.create({
+      data: {
+        username: adminUsername,
+        email: adminEmail,
+        password: hash,
+        is_admin: true,
+      },
+    });
+    console.log(`✔️  Seeded admin (${adminEmail} / ${adminPassword})`);
+  } else {
+    console.log(`ℹ️  Admin (${adminEmail}) already exists, skipping`);
+  }
+
+  // 3) Seed a superuser using credentials from .env
+  const suEmail = process.env.SUPERUSER_EMAIL;
+  const suPwd = process.env.SUPERUSER_PASSWORD;
+  const suUser = process.env.SUPERUSER_USERNAME ?? "superuser";
+
+  if (!suEmail || !suPwd) {
+    throw new Error(
+      "SUPERUSER_EMAIL and SUPERUSER_PASSWORD must be set in .env",
+    );
+  }
+
+  const existingSU = await prisma.user.findUnique({
+    where: { email: suEmail },
+  });
+
+  if (!existingSU) {
+    const suHash = await bcrypt.hash(suPwd, SALT_ROUNDS);
+    await prisma.user.create({
+      data: {
+        username: suUser,
+        email: suEmail,
+        password: suHash,
+        is_admin: true, // superuser has full rights
+      },
+    });
+    console.log(`✔️  Seeded superuser (${suEmail})`);
+  } else {
+    console.log(`ℹ️  Superuser (${suEmail}) already exists, skipping`);
+  }
 
   // 2. Create some avatars
   const avatars = await Promise.all(
