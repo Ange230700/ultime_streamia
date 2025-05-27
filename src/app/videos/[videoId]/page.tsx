@@ -4,14 +4,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState, useContext } from "react";
+import React, {
+  useEffect,
+  useState,
+  useContext,
+  useRef,
+  ChangeEvent,
+} from "react";
 import { unwrapApi } from "@/utils/unwrapApi";
 import http from "@/lib/http";
 import type { ApiResponse } from "@/types/api-response";
-import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { Chip } from "primereact/chip";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { Dialog } from "primereact/dialog";
+import { InputText } from "primereact/inputtext";
+import { InputTextarea } from "primereact/inputtextarea";
 import { useUser } from "@/app/hooks/useUser";
 import { useAdmin } from "@/app/hooks/useAdmin";
 import { ToastContext } from "@/app/ClientLayout";
@@ -35,6 +43,12 @@ export default function VideoDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [videoError, setVideoError] = useState(false);
+  const [isEditVisible, setIsEditVisible] = useState(false);
+  const [editableTitle, setEditableTitle] = useState("");
+  const [editableDesc, setEditableDesc] = useState("");
+  const [newThumbnail, setNewThumbnail] = useState<File | null>(null);
+  const [thumbPreview, setThumbPreview] = useState<string | undefined>();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function fetchVideo() {
@@ -65,6 +79,59 @@ export default function VideoDetailsPage() {
       fetchVideo();
     }
   }, [videoId, showToast]);
+
+  // Initialize edit form when opening
+  function openEditDialog() {
+    if (!video) return;
+    setEditableTitle(video.video_title);
+    setEditableDesc(video.video_description ?? "");
+    setThumbPreview(
+      video.thumbnail ? `data:image/png;base64,${video.thumbnail}` : undefined,
+    );
+    setNewThumbnail(null);
+    setIsEditVisible(true);
+  }
+
+  // Handle thumbnail file change
+  function onThumbChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      setNewThumbnail(file);
+      setThumbPreview(URL.createObjectURL(file));
+    }
+  }
+
+  // Save edits
+  async function saveEdits() {
+    if (!video) return;
+    try {
+      const form = new FormData();
+      form.append("video_title", editableTitle);
+      form.append("video_description", editableDesc);
+      if (newThumbnail) form.append("thumbnail", newThumbnail);
+
+      const res = await http.put<ApiResponse<VideoDetails>>(
+        `/api/videos/${video.video_id}`,
+        form,
+        { headers: { "Content-Type": "multipart/form-data" } },
+      );
+      const updated = unwrapApi(res.data);
+      setVideo(updated);
+      showToast({
+        severity: "success",
+        summary: "Video Updated",
+        detail: "Your changes have been saved.",
+      });
+      setIsEditVisible(false);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast({
+        severity: "error",
+        summary: "Update Failed",
+        detail: msg,
+      });
+    }
+  }
 
   if (loading) {
     return (
@@ -128,34 +195,17 @@ export default function VideoDetailsPage() {
     );
   } else if (video?.thumbnail) {
     mediaContent = (
-      <div
-        className="relative aspect-video w-full overflow-hidden rounded-lg shadow-md"
-        style={{ backgroundColor: "var(--highlight-bg)" }}
-      >
-        {!videoError ? (
-          <Image
-            src={`data:image/svg+xml;base64,${video.thumbnail}`}
-            alt={`${video.video_title} thumbnail"`}
-            className="object-cover"
-            fill
-          />
-        ) : (
-          <div
-            className="absolute inset-0 flex flex-col items-center justify-center"
-            style={{ backgroundColor: "var(--highlight-bg)" }}
-          >
-            <Avatar icon="pi pi-video" size="xlarge" shape="circle" />
-            <p>⚠️ Video failed to load</p>
-          </div>
-        )}
+      <div className="relative aspect-video w-full overflow-hidden rounded-lg shadow-md">
+        <Image
+          src={`data:image/png;base64,${video.thumbnail}`}
+          alt="thumbnail"
+          fill
+          className="object-cover"
+        />
       </div>
     );
   } else {
-    mediaContent = (
-      <div className="p-4 text-center text-lg">
-        No preview available for this video.
-      </div>
-    );
+    mediaContent = <p className="p-4 text-center">No preview available.</p>;
   }
 
   return (
@@ -164,13 +214,13 @@ export default function VideoDetailsPage() {
       <h1 className="text-4xl font-bold">{video?.video_title}</h1>
 
       {/* Categories */}
-      {video?.categories.length ? (
+      {video?.categories && video.categories.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {video.categories.map((c) => (
             <Chip key={c.category_id} label={c.category_name} />
           ))}
         </div>
-      ) : null}
+      )}
 
       {/* Description */}
       <p className="mt-4 text-lg">
@@ -226,9 +276,7 @@ export default function VideoDetailsPage() {
           <Button
             icon="pi pi-pencil"
             label="Edit Video"
-            onClick={() => {
-              /* open your edit dialog or navigate */
-            }}
+            onClick={openEditDialog}
           />
           <Button
             icon="pi pi-trash"
@@ -240,6 +288,69 @@ export default function VideoDetailsPage() {
           />
         </div>
       )}
+
+      {/* ─── Edit Dialog ────────────────────────────────────────────────── */}
+      <Dialog
+        header="Edit Video"
+        visible={isEditVisible}
+        style={{ width: "500px" }}
+        modal
+        onHide={() => setIsEditVisible(false)}
+      >
+        <div className="space-y-4">
+          <label className="block font-medium">
+            Title
+            <InputText
+              value={editableTitle}
+              onChange={(e) => setEditableTitle(e.target.value)}
+              className="w-full"
+            />
+          </label>
+
+          <label className="block font-medium">
+            Description
+            <InputTextarea
+              value={editableDesc}
+              onChange={(e) => setEditableDesc(e.target.value)}
+              className="w-full"
+              rows={4}
+            />
+          </label>
+
+          <label className="block font-medium">
+            Thumbnail
+            <div className="flex items-center gap-4">
+              {thumbPreview && (
+                <div className="relative aspect-video w-32 overflow-hidden rounded">
+                  <Image
+                    src={thumbPreview}
+                    alt="Preview"
+                    fill
+                    unoptimized
+                    className="object-cover"
+                  />
+                </div>
+              )}
+              <Button
+                label="Choose File"
+                onClick={() => fileInputRef.current?.click()}
+              />
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={onThumbChange}
+              />
+            </div>
+          </label>
+        </div>
+
+        <div className="mt-4 flex justify-end gap-2">
+          <Button label="Cancel" text onClick={() => setIsEditVisible(false)} />
+          <Button label="Save" icon="pi pi-check" onClick={saveEdits} />
+        </div>
+      </Dialog>
     </div>
   );
 }
