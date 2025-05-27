@@ -88,7 +88,9 @@ export default function VideoDetailsPage() {
     setEditableTitle(video.video_title);
     setEditableDesc(video.video_description ?? "");
     setThumbPreview(
-      video.thumbnail ? `data:image/png;base64,${video.thumbnail}` : undefined,
+      video.thumbnail
+        ? `data:image/svg+xml;base64,${video.thumbnail}`
+        : undefined,
     );
     setNewThumbnail(null);
     setIsEditVisible(true);
@@ -192,7 +194,6 @@ export default function VideoDetailsPage() {
             srcLang="en"
             label="English"
           />
-          Sorry, your browser doesn’t support embedded videos.
         </video>
       </div>
     );
@@ -200,7 +201,7 @@ export default function VideoDetailsPage() {
     mediaContent = (
       <div className="relative aspect-video w-full overflow-hidden rounded-lg shadow-md">
         <Image
-          src={`data:image/png;base64,${video?.thumbnail}`}
+          src={`data:image/svg+xml;base64,${video?.thumbnail}`}
           alt="thumbnail"
           fill
           unoptimized
