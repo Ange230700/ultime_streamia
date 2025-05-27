@@ -76,24 +76,29 @@ export async function PUT(request: Request) {
   const userId = BigInt(sub);
   const form = await request.formData();
   const emailField = form.get("email");
+  const usernameField = form.get("username");
 
-  if (typeof emailField !== "string") {
-    return error("Invalid email", 400);
+  const updateData: { email?: string; username?: string; avatar_id?: bigint } =
+    {};
+
+  if (emailField !== null) {
+    if (typeof emailField !== "string") {
+      return error("Invalid email", 400);
+    }
+    updateData.email = emailField;
+  }
+  if (usernameField !== null) {
+    if (typeof usernameField !== "string") {
+      return error("Invalid username", 400);
+    }
+    updateData.username = usernameField;
   }
 
-  const updateData: { email: string; avatar_id?: bigint } = {
-    email: emailField,
-  };
-  const avatarField = form.get("avatar");
-  if (avatarField instanceof File) {
-    const arrayBuffer = await avatarField.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    // store new avatar
-    const av = await prisma.avatar.create({
-      data: { image_data: buffer },
-    });
-    updateData.avatar_id = av.avatar_id;
+  if (
+    Object.keys(updateData).length === 0 &&
+    !(form.get("avatar") instanceof File)
+  ) {
+    return error("Nothing to update", 400);
   }
 
   // update user record
