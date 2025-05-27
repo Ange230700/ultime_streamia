@@ -23,6 +23,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { useUser } from "@/app/hooks/useUser";
 import { useAdmin } from "@/app/hooks/useAdmin";
 import { ToastContext } from "@/app/ClientLayout";
+import { makeDataImage } from "@/utils/makeDataImage";
 
 interface VideoDetails {
   video_id: number;
@@ -88,9 +89,7 @@ export default function VideoDetailsPage() {
     setEditableTitle(video.video_title);
     setEditableDesc(video.video_description ?? "");
     setThumbPreview(
-      video.thumbnail
-        ? `data:image/svg+xml;base64,${video.thumbnail}`
-        : undefined,
+      video.thumbnail ? makeDataImage(video.thumbnail) : undefined,
     );
     setNewThumbnail(null);
     setIsEditVisible(true);
@@ -201,7 +200,7 @@ export default function VideoDetailsPage() {
     mediaContent = (
       <div className="relative aspect-video w-full overflow-hidden rounded-lg shadow-md">
         <Image
-          src={`data:image/svg+xml;base64,${video?.thumbnail}`}
+          src={makeDataImage(video.thumbnail)}
           alt="thumbnail"
           fill
           unoptimized

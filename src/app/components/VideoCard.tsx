@@ -11,6 +11,7 @@ import { Avatar } from "primereact/avatar";
 import type { Video } from "@/app/contexts/VideoContext";
 import { Skeleton } from "primereact/skeleton";
 import { UserContext } from "@/app/contexts/UserContext";
+import { makeDataImage } from "@/utils/makeDataImage";
 
 export interface VideoCardProps {
   readonly video: Video & {
@@ -75,7 +76,7 @@ export default function VideoCard({
         )}
         <Image
           alt={video.video_title}
-          src={`data:image/svg+xml;base64,${video.thumbnail}`}
+          src={makeDataImage(video.thumbnail!)}
           unoptimized
           loader={({ src }) => src}
           fill
