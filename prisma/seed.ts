@@ -59,7 +59,7 @@ async function main() {
 
   // 2) Seed a known admin with hard‐coded credentials
   const adminEmail = "admin@streamia.test";
-  const adminPassword = "admin1234";
+  const adminPassword = "admin1234%";
   const adminUsername = "admin";
 
   const existingAdmin = await prisma.user.findUnique({

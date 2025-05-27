@@ -143,10 +143,12 @@ export default function Navbar() {
       {/* Admin View toggle (only for admins) */}
       {user?.is_admin && (
         <div className="flex items-center gap-2">
-          <span className="font-medium">Admin View</span>
+          {/* <span className="font-medium">Admin View</span> */}
           <InputSwitch
             checked={adminView}
             onChange={(e: InputSwitchChangeEvent) => setAdminView(e.value)}
+            tooltip="Admin View"
+            tooltipOptions={{ position: "bottom" }}
           />
         </div>
       )}
