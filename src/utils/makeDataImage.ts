@@ -1,4 +1,5 @@
 // src/utils/makeDataImage.ts
+
 export function makeDataImage(base64: string): string {
   // JPEG files always start with 0xFF D8, which in Base64 is “/9j/”
   if (base64.startsWith("/9j/")) {

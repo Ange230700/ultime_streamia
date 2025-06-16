@@ -1,4 +1,5 @@
 // src/app/videos/[videoId]/page.tsx
+
 "use client";
 
 import Image from "next/image";
